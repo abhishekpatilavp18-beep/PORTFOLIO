@@ -818,25 +818,25 @@ function initStaggeredGrid() {
 
   const chars = title.querySelectorAll('.char');
 
-  // GSAP Title Entrance scrubbed with scroll
+  // GSAP Title Entrance scrubbed with scroll (starts immediately as section nears view)
   gsap.timeline({
     scrollTrigger: {
-      trigger: title,
-      start: 'top 85%',
-      end: 'center 45%',
+      trigger: '#skills',
+      start: 'top 95%',
+      end: 'top 55%',
       scrub: 1,
     }
   }).from(chars, {
-    ease: 'sine.out',
-    yPercent: 180,
-    autoAlpha: 0,
+    ease: 'power2.out',
+    yPercent: 70,
+    autoAlpha: 0.1,
     stagger: {
-      each: 0.05,
+      each: 0.04,
       from: 'center'
     }
   });
 
-  // 2. Animate 7 Columns with Staggered Parallax
+  // 2. Animate 7 Columns with Immediate Staggered Parallax
   const gridItems = grid.querySelectorAll('.grid__item');
   const numColumns = 7;
   const middleColumnIndex = 3;
@@ -852,20 +852,20 @@ function initStaggeredGrid() {
 
   columns.forEach((columnItems, columnIndex) => {
     if (columnItems.length === 0) return;
-    const delayFactor = Math.abs(columnIndex - middleColumnIndex) * 0.15;
+    const delayFactor = Math.abs(columnIndex - middleColumnIndex) * 0.1;
 
     gsap.timeline({
       scrollTrigger: {
-        trigger: grid,
-        start: 'top 90%',
-        end: 'center 50%',
-        scrub: 1.5,
+        trigger: '#skills',
+        start: 'top 95%',
+        end: 'top 30%',
+        scrub: 1.2,
       }
     }).from(columnItems, {
-      yPercent: 260,
-      autoAlpha: 0,
+      yPercent: 65,
+      autoAlpha: 0.25,
       delay: delayFactor,
-      ease: 'sine.out',
+      ease: 'power2.out',
     });
   });
 
