@@ -419,21 +419,22 @@ body.intro-finished {
 .about-section {
   position: relative;
   width: 100vw;
-  min-height: auto;
+  min-height: 100vh;
   background-color: #000000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 110px 7vw 45px 7vw;
+  padding: 120px 7vw 100px 7vw;
   z-index: 20;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  box-sizing: border-box;
 }
 
 .about-container {
   display: grid;
   grid-template-columns: 1fr 1.35fr;
   gap: clamp(40px, 6vw, 95px);
-  align-items: start;
+  align-items: center;
   width: 100%;
   max-width: 1360px;
 }
@@ -593,7 +594,7 @@ body.intro-finished {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 85px 4vw 20px 4vw;
+  padding: 130px 4vw 30px 4vw;
   z-index: 20;
   overflow: hidden;
   box-sizing: border-box;
@@ -607,7 +608,7 @@ body.intro-finished {
   position: relative;
   z-index: 30;
   pointer-events: none;
-  margin-bottom: -35px;
+  margin-bottom: -15px;
 }
 
 .staggered-title {
