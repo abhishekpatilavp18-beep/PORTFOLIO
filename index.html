@@ -84,307 +84,194 @@
     <div class="stack-divider-line"></div>
   </div>
 
-  <!-- Skills Section with Staggered Grid Scroll Animation (Vengeance UI) -->
-  <section class="skills-section" id="skills">
+  <!-- Skills Section: Interactive 3D Solar System Tech Ecosystem (Vengeance UI) -->
+  <section class="skills-section solar-section" id="skills">
     <div class="skills-header">
-      <h2 class="staggered-title" id="staggeredTitle">SKILLS</h2>
-      <p class="skills-subtitle">Languages, frameworks, and developer tools I use to engineer modern applications</p>
+      <h2 class="staggered-title" id="staggeredTitle">TECH ECOSYSTEM</h2>
+      <p class="skills-subtitle">Interactive 3D planetary orbit of my languages, frameworks, databases & developer tools</p>
+      <div class="solar-hint-pill">
+        <span class="hint-dot"></span>
+        <span>Drag space to tilt in 3D · Hover any skill to inspect</span>
+      </div>
     </div>
 
-    <!-- Staggered 7-Column Parallax Grid -->
-    <div class="staggered-grid-wrapper">
-      <div class="grid--full" id="staggeredGrid">
-        
-        <!-- Row 1 -->
-        <figure class="grid__item" data-col="0">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" alt="C" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Language</span>
-                <span class="skill-name">C</span>
-              </div>
-            </div>
-          </div>
-        </figure>
+    <!-- 3D Orbital Solar System Viewport -->
+    <div class="solar-viewport" id="solarViewport">
+      <div class="solar-stage" id="solarStage">
 
-        <figure class="grid__item" data-col="1">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" alt="C++" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Language</span>
-                <span class="skill-name">C++</span>
-              </div>
-            </div>
+        <!-- Center Glowing Core / Sun -->
+        <div class="solar-sun">
+          <div class="sun-pulse-ring"></div>
+          <div class="sun-plasma-aura"></div>
+          <div class="sun-core-circle">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3" fill="#38bdf8" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" stroke="#38bdf8" />
+            </svg>
           </div>
-        </figure>
+          <span class="sun-tag">CORE STACK</span>
+        </div>
 
-        <figure class="grid__item" data-col="2">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Language</span>
-                <span class="skill-name">Python</span>
+        <!-- Orbit Ring 1 (Inner - Radius 130px) -->
+        <div class="orbit-track orbit-1">
+          <div class="orbit-line"></div>
+          <div class="orbit-rotator orbit-spin-cw" style="--duration: 26s;">
+            <!-- C -->
+            <div class="planet-anchor" style="--angle: 0deg; --radius: 130px;">
+              <div class="planet-pill" data-name="C">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" alt="C" />
+                <span>C</span>
               </div>
             </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="3">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Language</span>
-                <span class="skill-name">Java</span>
+            <!-- C++ -->
+            <div class="planet-anchor" style="--angle: 120deg; --radius: 130px;">
+              <div class="planet-pill" data-name="C++">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" alt="C++" />
+                <span>C++</span>
               </div>
             </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="4">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Structure</span>
-                <span class="skill-name">HTML</span>
+            <!-- Java -->
+            <div class="planet-anchor" style="--angle: 240deg; --radius: 130px;">
+              <div class="planet-pill" data-name="Java">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" />
+                <span>Java</span>
               </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="5">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Styling</span>
-                <span class="skill-name">CSS</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="6">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Language</span>
-                <span class="skill-name">JavaScript</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <!-- Row 2 -->
-        <figure class="grid__item" data-col="0">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React.js" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Frontend</span>
-                <span class="skill-name">React.js</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="1">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Runtime</span>
-                <span class="skill-name">Node.js</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="2">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" alt="Express.js" class="skill-icon" style="filter: invert(1);" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Backend</span>
-                <span class="skill-name">Express.js</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="3">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" alt="MongoDB" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Database</span>
-                <span class="skill-name">MongoDB</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="4">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Database</span>
-                <span class="skill-name">MySQL</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="5">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" alt="Prisma" class="skill-icon" style="filter: invert(1);" />
-              <div class="skill-reveal">
-                <span class="skill-sub">ORM</span>
-                <span class="skill-name">Prisma</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="6">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">VCS</span>
-                <span class="skill-name">Git</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <!-- Row 3: Skills + Center Bento Group -->
-        <figure class="grid__item" data-col="0">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" class="skill-icon" style="filter: invert(1);" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Platform</span>
-                <span class="skill-name">GitHub</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <figure class="grid__item" data-col="1">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Editor</span>
-                <span class="skill-name">VS Code</span>
-              </div>
-            </div>
-          </div>
-        </figure>
-
-        <!-- Center Bento Group (Spans Columns 2, 3, 4) -->
-        <div class="grid__item bento-container" data-col="2">
-          <!-- Bento 1: Frontend -->
-          <div class="bento-card active" data-bento="0">
-            <div class="bento-border"></div>
-            <div class="bento-active-content">
-              <div class="bento-badge-tag">FOCUS 01</div>
-              <h3 class="bento-title">Frontend Stack</h3>
-              <p class="bento-desc">React.js, Modern JavaScript, HTML5 & Responsive CSS UI</p>
-              <div class="bento-icons-row">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React" />
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JS" />
-              </div>
-            </div>
-            <div class="bento-inactive-content">
-              <span class="bento-pill">FRONTEND</span>
-            </div>
-          </div>
-
-          <!-- Bento 2: Backend -->
-          <div class="bento-card" data-bento="1">
-            <div class="bento-border"></div>
-            <div class="bento-active-content">
-              <div class="bento-badge-tag">FOCUS 02</div>
-              <h3 class="bento-title">Backend Architecture</h3>
-              <p class="bento-desc">Node.js, Express APIs, Python & Java Enterprise</p>
-              <div class="bento-icons-row">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node" />
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" />
-              </div>
-            </div>
-            <div class="bento-inactive-content">
-              <span class="bento-pill">BACKEND</span>
-            </div>
-          </div>
-
-          <!-- Bento 3: Databases & Tools -->
-          <div class="bento-card" data-bento="2">
-            <div class="bento-border"></div>
-            <div class="bento-active-content">
-              <div class="bento-badge-tag">FOCUS 03</div>
-              <h3 class="bento-title">Data & Design</h3>
-              <p class="bento-desc">MongoDB, MySQL, Prisma ORM, Git & Figma</p>
-              <div class="bento-icons-row">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" alt="MongoDB" />
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" />
-              </div>
-            </div>
-            <div class="bento-inactive-content">
-              <span class="bento-pill">DATA & TOOLS</span>
             </div>
           </div>
         </div>
 
-        <figure class="grid__item" data-col="5">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">UI/UX</span>
-                <span class="skill-name">Figma</span>
+        <!-- Orbit Ring 2 (Radius 215px) -->
+        <div class="orbit-track orbit-2">
+          <div class="orbit-line"></div>
+          <div class="orbit-rotator orbit-spin-ccw" style="--duration: 36s;">
+            <!-- HTML -->
+            <div class="planet-anchor" style="--angle: 0deg; --radius: 215px;">
+              <div class="planet-pill" data-name="HTML">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML" />
+                <span>HTML</span>
+              </div>
+            </div>
+            <!-- CSS -->
+            <div class="planet-anchor" style="--angle: 90deg; --radius: 215px;">
+              <div class="planet-pill" data-name="CSS">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS" />
+                <span>CSS</span>
+              </div>
+            </div>
+            <!-- JavaScript -->
+            <div class="planet-anchor" style="--angle: 180deg; --radius: 215px;">
+              <div class="planet-pill" data-name="JavaScript">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" />
+                <span>JavaScript</span>
+              </div>
+            </div>
+            <!-- React.js -->
+            <div class="planet-anchor" style="--angle: 270deg; --radius: 215px;">
+              <div class="planet-pill" data-name="React.js">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React.js" />
+                <span>React.js</span>
               </div>
             </div>
           </div>
-        </figure>
+        </div>
 
-        <figure class="grid__item" data-col="6">
-          <div class="grid__item-img">
-            <div class="item-overlay"></div>
-            <div class="item-content">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/canva/canva-original.svg" alt="Canva" class="skill-icon" />
-              <div class="skill-reveal">
-                <span class="skill-sub">Design</span>
-                <span class="skill-name">Canva</span>
+        <!-- Orbit Ring 3 (Radius 305px) -->
+        <div class="orbit-track orbit-3">
+          <div class="orbit-line"></div>
+          <div class="orbit-rotator orbit-spin-cw" style="--duration: 46s;">
+            <!-- Python -->
+            <div class="planet-anchor" style="--angle: 40deg; --radius: 305px;">
+              <div class="planet-pill" data-name="Python">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" />
+                <span>Python</span>
+              </div>
+            </div>
+            <!-- Node.js -->
+            <div class="planet-anchor" style="--angle: 130deg; --radius: 305px;">
+              <div class="planet-pill" data-name="Node.js">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" />
+                <span>Node.js</span>
+              </div>
+            </div>
+            <!-- Express.js -->
+            <div class="planet-anchor" style="--angle: 220deg; --radius: 305px;">
+              <div class="planet-pill" data-name="Express.js">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" alt="Express.js" style="filter: invert(1);" />
+                <span>Express.js</span>
+              </div>
+            </div>
+            <!-- Prisma -->
+            <div class="planet-anchor" style="--angle: 310deg; --radius: 305px;">
+              <div class="planet-pill" data-name="Prisma">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" alt="Prisma" style="filter: invert(1);" />
+                <span>Prisma</span>
               </div>
             </div>
           </div>
-        </figure>
+        </div>
+
+        <!-- Orbit Ring 4 (Radius 395px) -->
+        <div class="orbit-track orbit-4">
+          <div class="orbit-line"></div>
+          <div class="orbit-rotator orbit-spin-ccw" style="--duration: 58s;">
+            <!-- MongoDB -->
+            <div class="planet-anchor" style="--angle: 30deg; --radius: 395px;">
+              <div class="planet-pill" data-name="MongoDB">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" alt="MongoDB" />
+                <span>MongoDB</span>
+              </div>
+            </div>
+            <!-- MySQL -->
+            <div class="planet-anchor" style="--angle: 150deg; --radius: 395px;">
+              <div class="planet-pill" data-name="MySQL">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL" />
+                <span>MySQL</span>
+              </div>
+            </div>
+            <!-- Git -->
+            <div class="planet-anchor" style="--angle: 270deg; --radius: 395px;">
+              <div class="planet-pill" data-name="Git">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" />
+                <span>Git</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orbit Ring 5 (Outer Orbit - Radius 490px) -->
+        <div class="orbit-track orbit-5">
+          <div class="orbit-line"></div>
+          <div class="orbit-rotator orbit-spin-cw" style="--duration: 70s;">
+            <!-- GitHub -->
+            <div class="planet-anchor" style="--angle: 20deg; --radius: 490px;">
+              <div class="planet-pill" data-name="GitHub">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" style="filter: invert(1);" />
+                <span>GitHub</span>
+              </div>
+            </div>
+            <!-- VS Code -->
+            <div class="planet-anchor" style="--angle: 110deg; --radius: 490px;">
+              <div class="planet-pill" data-name="VS Code">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" />
+                <span>VS Code</span>
+              </div>
+            </div>
+            <!-- Figma -->
+            <div class="planet-anchor" style="--angle: 200deg; --radius: 490px;">
+              <div class="planet-pill" data-name="Figma">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" />
+                <span>Figma</span>
+              </div>
+            </div>
+            <!-- Canva -->
+            <div class="planet-anchor" style="--angle: 290deg; --radius: 490px;">
+              <div class="planet-pill" data-name="Canva">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/canva/canva-original.svg" alt="Canva" />
+                <span>Canva</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>

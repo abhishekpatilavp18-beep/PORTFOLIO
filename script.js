@@ -436,7 +436,7 @@ function initApp() {
   runEntrySequence();
   initNavObserver();
   initAsciiGlitchRipple();
-  initStaggeredGrid();
+  initSolarSystem();
 }
 
 // Update active navbar link on scroll
@@ -798,89 +798,127 @@ function initAsciiGlitchRipple() {
 }
 
 /* =========================================
-   STAGGERED GRID SCROLL ANIMATION (Vengeance UI)
-   7-Column Offset Parallax + Expanding Bento
+   SOLAR SYSTEM (VENGEANCE UI 3D ORBIT)
+   Interactive 3D Technology Ecosystem Animation
    ========================================= */
-function initStaggeredGrid() {
-  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-
-  gsap.registerPlugin(ScrollTrigger);
-
-  const grid = document.getElementById('staggeredGrid');
+function initSolarSystem() {
+  const viewport = document.getElementById('solarViewport');
+  const stage = document.getElementById('solarStage');
   const title = document.getElementById('staggeredTitle');
-  if (!grid || !title) return;
 
-  // 1. Split Title into individual character spans
-  const text = title.textContent.trim();
-  title.innerHTML = text.split('').map((char) =>
-    `<span class="char">${char === ' ' ? '&nbsp;' : char}</span>`
-  ).join('');
-
-  const chars = title.querySelectorAll('.char');
-
-  // GSAP Title Entrance scrubbed with scroll
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: '#skills',
-      start: 'top 85%',
-      end: 'top 35%',
-      scrub: 1.2,
-    }
-  }).from(chars, {
-    ease: 'power2.out',
-    yPercent: 90,
-    autoAlpha: 0.25,
-    stagger: {
-      each: 0.05,
-      from: 'center'
-    }
-  });
-
-  // 2. Animate 7 Columns with Deep Cinematic Staggered Parallax
-  const gridItems = grid.querySelectorAll('.grid__item');
-  const numColumns = 7;
-  const middleColumnIndex = 3;
-  const columns = Array.from({ length: numColumns }, () => []);
-
-  gridItems.forEach((item) => {
-    const colAttr = item.getAttribute('data-col');
-    const colIndex = colAttr !== null ? parseInt(colAttr, 10) : 0;
-    if (columns[colIndex]) {
-      columns[colIndex].push(item);
-    }
-  });
-
-  columns.forEach((columnItems, columnIndex) => {
-    if (columnItems.length === 0) return;
-    const delayFactor = Math.abs(columnIndex - middleColumnIndex) * 0.18;
-
-    gsap.timeline({
+  // 1. Entrance for Section Title
+  if (title && typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.from(title, {
       scrollTrigger: {
-        trigger: grid,
-        start: 'top bottom',
-        end: 'center center',
-        scrub: 1.5,
-      }
-    }).from(columnItems, {
-      yPercent: 220,
-      autoAlpha: 0.2,
-      delay: delayFactor,
-      ease: 'sine.out',
+        trigger: '#skills',
+        start: 'top 85%',
+        toggleActions: 'play none none none',
+      },
+      duration: 0.9,
+      y: 25,
+      opacity: 0,
+      ease: 'power3.out',
+    });
+  }
+
+  if (!viewport || !stage) return;
+
+  // 2. Pause Orbit on Planet Hover
+  const planetPills = viewport.querySelectorAll('.planet-pill');
+  planetPills.forEach((pill) => {
+    pill.addEventListener('mouseenter', () => {
+      viewport.classList.add('is-paused');
+    });
+    pill.addEventListener('mouseleave', () => {
+      viewport.classList.remove('is-paused');
     });
   });
 
-  // 3. Interactive Bento Card Expansion on Hover
-  const bentoCards = grid.querySelectorAll('.bento-card');
-  bentoCards.forEach((card) => {
-    card.addEventListener('mouseenter', () => {
-      bentoCards.forEach((c) => c.classList.remove('active'));
-      card.classList.add('active');
-    });
-    card.addEventListener('click', () => {
-      bentoCards.forEach((c) => c.classList.remove('active'));
-      card.classList.add('active');
-    });
+  // 3. 3D Interactive Mouse & Touch Drag / Tilt
+  const BASE_TILT_X = 66;
+  const BASE_TILT_Z = -14;
+  let currentTiltX = BASE_TILT_X;
+  let currentTiltZ = BASE_TILT_Z;
+  let targetTiltX = BASE_TILT_X;
+  let targetTiltZ = BASE_TILT_Z;
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let dragStartTiltX = BASE_TILT_X;
+  let dragStartTiltZ = BASE_TILT_Z;
+  let rafId = null;
+
+  function updateTilt() {
+    currentTiltX += (targetTiltX - currentTiltX) * 0.08;
+    currentTiltZ += (targetTiltZ - currentTiltZ) * 0.08;
+    stage.style.setProperty('--tilt-x', `${currentTiltX.toFixed(2)}deg`);
+    stage.style.setProperty('--tilt-z', `${currentTiltZ.toFixed(2)}deg`);
+
+    if (Math.abs(targetTiltX - currentTiltX) > 0.01 || Math.abs(targetTiltZ - currentTiltZ) > 0.01) {
+      rafId = requestAnimationFrame(updateTilt);
+    } else {
+      rafId = null;
+    }
+  }
+
+  function scheduleUpdate() {
+    if (!rafId) {
+      rafId = requestAnimationFrame(updateTilt);
+    }
+  }
+
+  // Mouse Move subtle parallax tilt when hovering
+  viewport.addEventListener('mousemove', (e) => {
+    if (isDragging) return;
+    const rect = viewport.getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+    const ny = (e.clientY - rect.top) / rect.height - 0.5;
+
+    targetTiltX = BASE_TILT_X - ny * 18;
+    targetTiltZ = BASE_TILT_Z + nx * 24;
+    scheduleUpdate();
   });
+
+  viewport.addEventListener('mouseleave', () => {
+    if (isDragging) return;
+    targetTiltX = BASE_TILT_X;
+    targetTiltZ = BASE_TILT_Z;
+    scheduleUpdate();
+  });
+
+  // Pointer drag to dynamically rotate 3D angle
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.planet-pill')) return;
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    dragStartTiltX = targetTiltX;
+    dragStartTiltZ = targetTiltZ;
+    viewport.setPointerCapture(e.pointerId);
+  });
+
+  viewport.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    // Drag vertically tilts X, drag horizontally tilts Z
+    targetTiltX = Math.max(35, Math.min(85, dragStartTiltX - dy * 0.22));
+    targetTiltZ = dragStartTiltZ + dx * 0.28;
+    scheduleUpdate();
+  });
+
+  const endDrag = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    try {
+      viewport.releasePointerCapture(e.pointerId);
+    } catch (err) {}
+  };
+
+  viewport.addEventListener('pointerup', endDrag);
+  viewport.addEventListener('pointercancel', endDrag);
 }
 
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {
