@@ -43,7 +43,8 @@ resize();
 // Ambient drifting dust/stars on pure black background
 function initAmbientParticles() {
   ambientParticles = [];
-  const count = Math.floor((canvas.width * canvas.height) / 16000);
+  // Moderately increased density for a richer starry atmosphere without messiness
+  const count = Math.floor((canvas.width * canvas.height) / 8500);
   for (let i = 0; i < count; i++) {
     ambientParticles.push({
       x: Math.random() * canvas.width,
@@ -51,7 +52,7 @@ function initAmbientParticles() {
       size: Math.random() * 1.6 + 0.6,
       speedX: (Math.random() - 0.5) * 0.25,
       speedY: (Math.random() - 0.5) * 0.25,
-      alpha: Math.random() * 0.45 + 0.1
+      alpha: Math.random() * 0.45 + 0.12
     });
   }
 }
