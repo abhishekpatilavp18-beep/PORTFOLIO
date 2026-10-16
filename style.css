@@ -16,6 +16,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow: hidden;
+  height: 100%;
 }
 
 body {
@@ -24,9 +26,19 @@ body {
   background-color: #000000;
   color: #ffffff;
   font-family: var(--font-main);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Enabled only after intro completes */
+html.intro-finished {
+  overflow-y: auto;
+  height: auto;
+}
+
+body.intro-finished {
   overflow-x: hidden;
   overflow-y: auto;
-  user-select: none;
 }
 
 /* =========================================
@@ -497,15 +509,15 @@ body {
 }
 
 .bio-line {
-  margin: 0 0 16px 0;
+  margin: 0 0 4px 0;
   line-height: 1.85;
   transition: color 0.3s ease;
   position: relative;
   cursor: pointer;
-  border-radius: 8px;
-  padding: 4px 8px;
-  margin-left: -8px;
-  margin-right: -8px;
+  border-radius: 4px;
+  padding: 1px 4px;
+  margin-left: -4px;
+  margin-right: -4px;
 }
 
 .bio-line:last-child {

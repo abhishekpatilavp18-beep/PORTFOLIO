@@ -1,3 +1,14 @@
+// Ensure reload or fresh visit ALWAYS starts at Home (top 0, 0)
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
+// If URL has a hash (like #about), remove it so the browser does not jump down on reload
+if (window.location.hash && window.location.hash !== '#home') {
+  history.replaceState(null, null, window.location.pathname);
+}
+
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -401,6 +412,8 @@ function runEntrySequence() {
                     heroFooter.classList.add('intro-visible');
 
                     introComplete = true;
+                    document.documentElement.classList.add('intro-finished');
+                    document.body.classList.add('intro-finished');
 
                     // Thousands of pixels rush in from outer space to assemble Abhishek's portrait!
                     startParticleAssembly = true;
@@ -453,31 +466,122 @@ function initNavObserver() {
 
 /* =========================================
    ASCII GLITCH RIPPLE (Vengeance UI Port)
-   Smooth, isolated line-by-line hover animation
+   Dynamic visual line grouping:
+   ONLY the exact single visual line under the cursor animates!
    ========================================= */
 function initAsciiGlitchRipple() {
-  const lineEls = document.querySelectorAll('.ascii-line');
-  if (!lineEls || lineEls.length === 0) return;
+  const container = document.getElementById('bioText');
+  if (!container) return;
 
-  // Gentle, cinematic timing constants (slower and smoother)
+  // Gentle, cinematic timing constants
   const WAVE_THRESH = 4;
   const CHAR_MULT = 2;
-  const ANIM_STEP = 75; // Slower scramble updates so characters are legible
+  const ANIM_STEP = 80;
   const WAVE_BUF = 4;
-  const dur = 2200; // Calmer, slower duration for smooth wave propagation
+  const dur = 2400; // Calm and smooth ripple pace
   const chars = '.,·-─~+:;=*π""┐┌┘┴┬╗╔╝╚╬╠╣╩╦║░▒▓█▄▀▌▐■!?&#$@0123456789*';
   const preserveSpaces = true;
-  const spread = 1.6; // Gentle wave spread
+  const spread = 1.8;
 
-  lineEls.forEach((el) => {
-    setupLineRipple(el);
-  });
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // Preserve original source HTML template
+  const originalHtml = container.innerHTML;
+
+  function buildVisualLines() {
+    // 1. Break into word and whitespace tokens, tracking highlight status
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = originalHtml;
+
+    const tokens = [];
+    function extract(node, isHighlight) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const parts = node.textContent.split(/(\s+)/);
+        parts.forEach((p) => {
+          if (p.length > 0) {
+            tokens.push({ text: p, isSpace: /^\s+$/.test(p), isHighlight });
+          }
+        });
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const h = isHighlight || node.classList.contains('highlight');
+        node.childNodes.forEach((child) => extract(child, h));
+      }
+    }
+    tempDiv.childNodes.forEach((child) => extract(child, false));
+
+    // 2. Render measurable spans to read rendered line wrapping on this specific screen
+    container.innerHTML = '';
+    const spanRefs = [];
+    tokens.forEach((tok) => {
+      const span = document.createElement('span');
+      span.textContent = tok.text;
+      span.style.display = 'inline';
+      if (tok.isHighlight) span.className = 'highlight';
+      container.appendChild(span);
+      spanRefs.push({ span, tok });
+    });
+
+    // 3. Group words into lines by measuring their bounding top
+    const lines = [];
+    let currentLine = [];
+    let currentTop = null;
+
+    spanRefs.forEach(({ span, tok }) => {
+      if (tok.isSpace) {
+        if (currentLine.length > 0) currentLine.push(tok);
+        return;
+      }
+
+      const rect = span.getBoundingClientRect();
+      const top = Math.round(rect.top);
+
+      if (currentTop === null || Math.abs(top - currentTop) > 6) {
+        if (currentLine.length > 0) lines.push(currentLine);
+        currentLine = [tok];
+        currentTop = top;
+      } else {
+        currentLine.push(tok);
+      }
+    });
+
+    if (currentLine.length > 0) lines.push(currentLine);
+
+    // 4. Reconstruct DOM with strictly ONE container per physical visual line
+    container.innerHTML = '';
+    lines.forEach((lineTokens) => {
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'bio-line ascii-line';
+
+      let html = '';
+      let inHighlight = false;
+      lineTokens.forEach((tok) => {
+        if (tok.isHighlight && !inHighlight) {
+          html += '<span class="highlight">';
+          inHighlight = true;
+        } else if (!tok.isHighlight && inHighlight) {
+          html += '</span>';
+          inHighlight = false;
+        }
+        html += escapeHtml(tok.text);
+      });
+      if (inHighlight) html += '</span>';
+
+      lineDiv.innerHTML = html.trim();
+      container.appendChild(lineDiv);
+      setupLineRipple(lineDiv);
+    });
+  }
 
   function setupLineRipple(el) {
-    const origHtml = el.innerHTML;
-
-    // Parse characters and preserve <span class="highlight"> tags
+    const origLineHtml = el.innerHTML;
     const charData = [];
+
     el.childNodes.forEach((node) => {
       if (node.nodeType === Node.TEXT_NODE) {
         const txt = node.textContent;
@@ -526,7 +630,6 @@ function initAsciiGlitchRipple() {
         } catch (err) {}
       }
 
-      // Proportional fallback
       const rect = el.getBoundingClientRect();
       const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       cursorPos = Math.max(0, Math.min(Math.floor(relX * totalLen), totalLen - 1));
@@ -568,7 +671,7 @@ function initAsciiGlitchRipple() {
         let ch = item.char;
 
         if (preserveSpaces && ch === ' ') {
-          // Keep space
+          // Keep spaces untouched
         } else {
           const res = calcWaveEffect(i, t);
           if (res.shouldAnim) {
@@ -599,7 +702,7 @@ function initAsciiGlitchRipple() {
     }
 
     function stop() {
-      el.innerHTML = origHtml;
+      el.innerHTML = origLineHtml;
       el.classList.remove('as');
       isAnim = false;
       waves = [];
@@ -642,7 +745,7 @@ function initAsciiGlitchRipple() {
       if (!isAnim) start();
     }
 
-    // ONLY this specific line triggers when cursor is brought on it
+    // ONLY this exact single visual line triggers on hover
     el.addEventListener('mouseenter', (e) => {
       isHover = true;
       const pos = getCursorPos(e);
@@ -654,7 +757,6 @@ function initAsciiGlitchRipple() {
       const oldPos = cursorPos;
       const pos = getCursorPos(e);
       const now = Date.now();
-      // Throttle waves so mouse movements remain smooth and serene
       if (now - lastWaveTime > 600 && Math.abs(pos - oldPos) >= 5) {
         startWave(pos);
       }
@@ -669,6 +771,17 @@ function initAsciiGlitchRipple() {
       startWave(pos);
     });
   }
+
+  buildVisualLines();
+
+  // Re-calculate lines if user resizes window (debounced)
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      buildVisualLines();
+    }, 250);
+  });
 }
 
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {
