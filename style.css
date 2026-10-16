@@ -191,60 +191,169 @@ html, body {
   filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.9));
 }
 
-/* Animated letter groups */
-.anim-letter-group {
-  display: inline-block;
-  opacity: 0;
-  transform: scale(0.85);
-  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.anim-letter-group.show {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Integrated Exclamation Mark Component */
-.excl-mark-wrap {
+/* =========================================
+   PHYSICS INTRO: FALLING "i" WITH BOUNCE & SHADOWS
+   ========================================= */
+.i-letter-wrap {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: clamp(6px, 0.8vw, 12px);
   margin: 0 clamp(4px, 0.6vw, 10px);
-  transform-origin: center center;
-  opacity: 0;
-  transform: scale(0.2) rotate(22deg);
-  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.3s ease;
   vertical-align: middle;
+  transform-origin: center bottom;
 }
 
-.excl-mark-wrap.pop {
+/* Floor Shadow below the landing point */
+.i-floor-shadow {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  width: clamp(40px, 4.5vw, 70px);
+  height: clamp(10px, 1.2vw, 16px);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.65) 0%, rgba(59, 130, 246, 0.35) 45%, rgba(0, 0, 0, 0) 75%);
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+.i-floor-shadow.active-shadow {
+  animation: shadowBounce 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes shadowBounce {
+  0% { transform: translateX(-50%) scale(0); opacity: 0; }
+  35% { transform: translateX(-50%) scale(1.4); opacity: 0.9; }
+  50% { transform: translateX(-50%) scale(0.6); opacity: 0.3; }
+  65% { transform: translateX(-50%) scale(1.2); opacity: 0.8; }
+  80% { transform: translateX(-50%) scale(0.85); opacity: 0.5; }
+  100% { transform: translateX(-50%) scale(1); opacity: 0.7; }
+}
+
+/* Dot: Falls first from the top and bounces */
+.i-dot {
+  width: clamp(16px, 1.9vw, 26px);
+  height: clamp(16px, 1.9vw, 26px);
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 10px 20px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  display: block;
+  transform: translateY(-90vh);
+}
+
+.i-dot.drop-bounce {
   opacity: 1;
-  transform: scale(1) rotate(22deg);
+  animation: dotDrop 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-.excl-mark-wrap.straight {
-  transform: scale(1) rotate(0deg);
-  gap: 2px;
+@keyframes dotDrop {
+  0% {
+    transform: translateY(-85vh) scaleY(1.5) scaleX(0.7);
+    opacity: 0;
+  }
+  45% {
+    transform: translateY(0) scaleY(0.6) scaleX(1.4);
+    opacity: 1;
+  }
+  65% {
+    transform: translateY(-40px) scaleY(1.1) scaleX(0.9);
+  }
+  80% {
+    transform: translateY(0) scaleY(0.85) scaleX(1.15);
+  }
+  92% {
+    transform: translateY(-12px) scale(1);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
-.excl-bar {
+/* Bar: Falls right after the dot and bounces */
+.i-bar {
   width: clamp(16px, 1.9vw, 26px);
   height: clamp(52px, 6.8vw, 86px);
   background: linear-gradient(180deg, #ffffff 0%, #9ca3af 100%);
   border-radius: 6px;
-  box-shadow: 0 0 35px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 35px rgba(255, 255, 255, 0.6), 0 15px 30px rgba(0, 0, 0, 0.8);
+  opacity: 0;
   display: block;
+  transform: translateY(-90vh);
 }
 
-.excl-dot {
-  width: clamp(16px, 1.9vw, 26px);
-  height: clamp(16px, 1.9vw, 26px);
-  background: #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
-  display: block;
+.i-bar.drop-bounce {
+  opacity: 1;
+  animation: barDrop 0.95s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes barDrop {
+  0% {
+    transform: translateY(-90vh) scaleY(1.4) scaleX(0.7) rotate(25deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(0) scaleY(0.65) scaleX(1.35) rotate(16deg);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-35px) scaleY(1.1) scaleX(0.9) rotate(8deg);
+  }
+  85% {
+    transform: translateY(0) scaleY(0.88) scaleX(1.12) rotate(2deg);
+  }
+  94% {
+    transform: translateY(-10px) scale(1) rotate(0deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* When fused into uppercase I */
+.i-letter-wrap.fused {
+  gap: 0;
+  transition: gap 0.3s ease;
+}
+
+.i-letter-wrap.fused .i-dot {
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.i-letter-wrap.fused .i-bar {
+  height: clamp(65px, 8.5vw, 110px);
+  border-radius: 4px;
+  transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================
+   ATTACHING LETTERS: "ABH" (LEFT) & "SHEK" (RIGHT)
+   ========================================= */
+.anim-letter-group {
+  display: inline-block;
+  opacity: 0;
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.9));
+}
+
+.anim-letter-group.slide-left {
+  transform: translateX(-150px);
+}
+
+.anim-letter-group.slide-right {
+  transform: translateX(150px);
+}
+
+.anim-letter-group.attached {
+  opacity: 1;
+  transform: translateX(0);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
 }
 
 /* =========================================

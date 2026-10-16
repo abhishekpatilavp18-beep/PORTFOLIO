@@ -14,7 +14,10 @@ portraitImg.src = 'portrait.png';
 const heroCenter = document.getElementById('heroCenter');
 const giantTitle = document.getElementById('giantTitle');
 const prefixText = document.getElementById('prefixText');
-const exclWrap = document.getElementById('exclWrap');
+const iLetterWrap = document.getElementById('iLetterWrap');
+const iDot = document.getElementById('iDot');
+const iBar = document.getElementById('iBar');
+const iFloorShadow = document.getElementById('iFloorShadow');
 const suffixText = document.getElementById('suffixText');
 const mainNavbar = document.getElementById('mainNavbar');
 const heroFooter = document.getElementById('heroFooter');
@@ -318,36 +321,42 @@ function morphText(fromText, toText, duration, onComplete) {
 }
 
 // =========================================
-// ENTRY ANIMATION TIMELINE (MATCHING REFERENCE VIDEO)
+// ENTRY ANIMATION TIMELINE: FALLING "i" WITH BOUNCE & SHADOWS
 // =========================================
 function runEntrySequence() {
-  // Step 1: Center exclamation mark pops in (100ms)
+  // Step 1: The DOT falls from the top with gravity, bounces on the floor, and casts shadow (150ms)
   setTimeout(() => {
-    exclWrap.classList.add('pop');
-  }, 100);
+    iDot.classList.add('drop-bounce');
+    iFloorShadow.classList.add('active-shadow');
+  }, 150);
 
-  // Step 2: "ABH" pops on left, "SHEK" on right (850ms) -> "ABH ! SHEK"
+  // Step 2: The body BAR falls from the top right after, lands and spring-bounces (450ms)
+  setTimeout(() => {
+    iBar.classList.add('drop-bounce');
+  }, 450);
+
+  // Step 3: "ABH" slides in from the left, "SHEK" slides in from the right to attach to "i" (1400ms)
   setTimeout(() => {
     prefixText.textContent = 'ABH';
     suffixText.textContent = 'SHEK';
-    prefixText.classList.add('show');
-    suffixText.classList.add('show');
-  }, 850);
+    prefixText.classList.add('attached');
+    suffixText.classList.add('attached');
+  }, 1400);
 
-  // Step 3: "!" straightens into "I" (1700ms) -> "ABHISHEK"
+  // Step 4: As letters dock, fuse dot & bar into solid uppercase "I" (2050ms) -> "ABHISHEK"
   setTimeout(() => {
-    exclWrap.classList.add('straight');
-  }, 1700);
+    iLetterWrap.classList.add('fused');
+  }, 2050);
 
-  // Step 4: Morph "ABHISHEK" -> "PORTFOLIO" (2600ms)
+  // Step 5: Morph "ABHISHEK" -> "PORTFOLIO" (2800ms)
   setTimeout(() => {
     giantTitle.innerHTML = 'ABHISHEK';
     morphText('ABHISHEK', 'PORTFOLIO', 750, () => {
-      // Step 5: "PORTFOLIO" glides down to bottom position (3450ms)
+      // Step 6: "PORTFOLIO" glides smoothly down to bottom position (3650ms)
       setTimeout(() => {
         heroCenter.classList.add('in-position');
 
-        // Step 6: Reveal navbar, footer, and trigger cosmic particle assembly (3900ms)
+        // Step 7: Reveal navbar, footer, and trigger cosmic particle assembly (4100ms)
         setTimeout(() => {
           mainNavbar.classList.remove('intro-hidden');
           mainNavbar.classList.add('intro-visible');
@@ -366,7 +375,7 @@ function runEntrySequence() {
         }, 450);
       }, 150);
     });
-  }, 2600);
+  }, 2800);
 }
 
 // Handle both fresh load and cached load reliably
