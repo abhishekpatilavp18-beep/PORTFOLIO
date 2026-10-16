@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abhishek — Portfolio</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <a href="#home" class="logo">ABHISHEK</a>
+    <nav class="nav-links">
+      <a href="#home" class="nav-link active">HOME</a>
+      <a href="#about" class="nav-link">ABOUT</a>
+      <a href="#service" class="nav-link">SERVICE</a>
+      <a href="#project" class="nav-link">PROJECT</a>
+      <a href="#components" class="nav-link">COMPONENTS</a>
+      <a href="#contact" class="nav-link">CONTACT</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="hero-section" id="home">
+    <!-- Background Canvas for Interactive Pixel/Particle Portrait & Ambient Dust -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Overlay Titles & Badges -->
+    <div class="hero-foreground">
+      <div class="hero-center">
+        <h1 class="giant-portfolio-text">PORTFOLIO</h1>
+      </div>
+
+      <div class="hero-footer-bar">
+        <div class="hero-role-wrapper">
+          <span class="role-bold">Full Stack</span>
+          <span class="role-italic">Developer</span>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#contact" class="btn-circle-arrow" title="View Contact">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </a>
+          <a href="#contact" class="btn-pill-contact">Contact</a>
+          <a href="#projects" class="btn-cta-highlight">
+            <span>EXPLORE WORK</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Interaction Guide Hint -->
+    <div class="interaction-hint">
+      <span class="pulse-dot"></span> Hover over the portrait to disperse particles • Click to scatter
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
