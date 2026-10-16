@@ -353,7 +353,8 @@ function morphText(fromText, toText, duration, onComplete) {
 // 1. "i" falls first, bounces & stays FIXED
 // 2. "ABH" scramble-animates on the left of "i"
 // 3. "SHEK" scramble-animates on the right of "i"
-// 4. "ABHISHEK" scramble-morphs into "PORTFOLIO"
+// 4. Dwell time so visitors can clearly read "ABHISHEK"
+// 5. "ABHISHEK" scramble-morphs into "PORTFOLIO"
 // =========================================
 function runEntrySequence() {
   // Step 1: The DOT falls from the top with gravity, bounces on the floor, and casts shadow (150ms)
@@ -367,30 +368,30 @@ function runEntrySequence() {
     iBar.classList.add('drop-bounce');
   }, 450);
 
-  // Step 3: "i" is now completely settled & FIXED in center.
-  // "ABH" on the left scramble-morphs into place (1300ms)
+  // Step 3: "i" is completely settled & FIXED in center.
+  // "ABH" on the left scramble-morphs in gracefully (1400ms, duration: 850ms)
   setTimeout(() => {
-    scrambleReveal(prefixText, 'ABH', 650, () => {
-      // Step 4: "SHEK" on the right scramble-morphs into place (1950ms)
+    scrambleReveal(prefixText, 'ABH', 850, () => {
+      // Step 4: "SHEK" on the right scramble-morphs in gracefully (duration: 900ms)
       setTimeout(() => {
-        scrambleReveal(suffixText, 'SHEK', 700, () => {
-          // Step 5: Both sides have assembled! Fuse "i" cleanly into uppercase "I" (2800ms)
+        scrambleReveal(suffixText, 'SHEK', 900, () => {
+          // Step 5: Both sides assembled! Fuse "i" cleanly into uppercase "I"
           setTimeout(() => {
             iLetterWrap.classList.add('dock-impact');
             iLetterWrap.classList.add('fused');
             setTimeout(() => {
               iLetterWrap.classList.remove('dock-impact');
-            }, 250);
+            }, 300);
 
-            // Step 6: Morph "ABHISHEK" -> "PORTFOLIO" (3400ms)
+            // DWELL TIME: 1.8 full seconds so visitors can read "ABHISHEK" clearly!
             setTimeout(() => {
               giantTitle.innerHTML = 'ABHISHEK';
-              morphText('ABHISHEK', 'PORTFOLIO', 750, () => {
-                // Step 7: "PORTFOLIO" glides smoothly down to bottom position (4250ms)
+              morphText('ABHISHEK', 'PORTFOLIO', 900, () => {
+                // Step 7: "PORTFOLIO" glides smoothly down to bottom position
                 setTimeout(() => {
                   heroCenter.classList.add('in-position');
 
-                  // Step 8: Reveal navbar, footer, and trigger cosmic particle assembly (4700ms)
+                  // Step 8: Reveal navbar, footer, and trigger cosmic particle assembly
                   setTimeout(() => {
                     mainNavbar.classList.remove('intro-hidden');
                     mainNavbar.classList.add('intro-visible');
@@ -406,15 +407,15 @@ function runEntrySequence() {
                     // Thousands of pixels rush in from outer space to assemble Abhishek's portrait!
                     startParticleAssembly = true;
                     createParticles(true);
-                  }, 450);
-                }, 150);
+                  }, 500);
+                }, 200);
               });
-            }, 600);
-          }, 150);
+            }, 1800); // 1800ms comfortable reading pause for ABHISHEK
+          }, 200);
         });
-      }, 100);
+      }, 150);
     });
-  }, 1300);
+  }, 1400);
 }
 
 // Handle both fresh load and cached load reliably
