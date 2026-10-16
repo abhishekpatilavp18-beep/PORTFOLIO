@@ -439,6 +439,7 @@ function initApp() {
   initSolarSystem();
   initBooksShowcase();
   initWaveGridBackground();
+  initSocialFlipButton();
 }
 
 // Update active navbar link on scroll
@@ -2327,6 +2328,23 @@ function initWaveGridBackground() {
   }
 
   requestAnimationFrame(animateWave);
+}
+
+/* =========================================
+   SOCIAL FLIP BUTTON INTERACTION
+   Handles touch toggle and accessibility
+   ========================================= */
+function initSocialFlipButton() {
+  const btn = document.getElementById('socialFlipButton');
+  if (!btn) return;
+
+  // Toggle flipped state on touch devices
+  btn.addEventListener('touchstart', (e) => {
+    // Only toggle if not clicking directly on a back-face link
+    if (!e.target.closest('.social-flip-node')) {
+      btn.classList.toggle('touch-active');
+    }
+  }, { passive: true });
 }
 
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {
