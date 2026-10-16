@@ -452,231 +452,223 @@ function initNavObserver() {
 }
 
 /* =========================================
-   ASCII GLITCH RIPPLE (Vengeance UI)
-   Interactive wave distortion for About Me content
+   ASCII GLITCH RIPPLE (Vengeance UI Port)
+   Smooth, isolated line-by-line hover animation
    ========================================= */
 function initAsciiGlitchRipple() {
-  const el = document.getElementById('bioText');
-  const card = document.getElementById('bioCard');
-  if (!el || !card) return;
+  const lineEls = document.querySelectorAll('.ascii-line');
+  if (!lineEls || lineEls.length === 0) return;
 
-  const origHtml = el.innerHTML;
-
-  // Extract character data while preserving <span class="highlight"> markup
-  const charData = [];
-  el.childNodes.forEach((node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const txt = node.textContent;
-      for (let i = 0; i < txt.length; i++) {
-        charData.push({ char: txt[i], isHighlight: false });
-      }
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      const isHighlight = node.classList.contains('highlight');
-      const txt = node.textContent;
-      for (let i = 0; i < txt.length; i++) {
-        charData.push({ char: txt[i], isHighlight: isHighlight });
-      }
-    }
-  });
-
-  const totalLen = charData.length;
-  if (totalLen === 0) return;
-
-  // Wave ripple constants from Vengeance UI
-  const WAVE_THRESH = 3;
-  const CHAR_MULT = 3;
-  const ANIM_STEP = 40;
-  const WAVE_BUF = 5;
-  const dur = 1000;
+  // Gentle, cinematic timing constants (slower and smoother)
+  const WAVE_THRESH = 4;
+  const CHAR_MULT = 2;
+  const ANIM_STEP = 75; // Slower scramble updates so characters are legible
+  const WAVE_BUF = 4;
+  const dur = 2200; // Calmer, slower duration for smooth wave propagation
   const chars = '.,·-─~+:;=*π""┐┌┘┴┬╗╔╝╚╬╠╣╩╦║░▒▓█▄▀▌▐■!?&#$@0123456789*';
   const preserveSpaces = true;
-  const spread = 1.1;
+  const spread = 1.6; // Gentle wave spread
 
-  let isAnim = false;
-  let cursorPos = 0;
-  let waves = [];
-  let animId = null;
-  let isHover = false;
-  let autoTriggered = false;
+  lineEls.forEach((el) => {
+    setupLineRipple(el);
+  });
 
-  function updateCursorPos(e) {
-    if (document.caretRangeFromPoint) {
-      try {
-        const range = document.caretRangeFromPoint(e.clientX, e.clientY);
-        if (range && el.contains(range.startContainer)) {
-          let offset = range.startOffset;
-          let node = range.startContainer;
-          let count = 0;
-          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
-          let found = false;
-          while (walker.nextNode()) {
-            if (walker.currentNode === node) {
-              cursorPos = Math.max(0, Math.min(count + offset, totalLen - 1));
-              found = true;
-              break;
+  function setupLineRipple(el) {
+    const origHtml = el.innerHTML;
+
+    // Parse characters and preserve <span class="highlight"> tags
+    const charData = [];
+    el.childNodes.forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const txt = node.textContent;
+        for (let i = 0; i < txt.length; i++) {
+          charData.push({ char: txt[i], isHighlight: false });
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const isHighlight = node.classList.contains('highlight');
+        const txt = node.textContent;
+        for (let i = 0; i < txt.length; i++) {
+          charData.push({ char: txt[i], isHighlight: isHighlight });
+        }
+      }
+    });
+
+    const totalLen = charData.length;
+    if (totalLen === 0) return;
+
+    let isAnim = false;
+    let cursorPos = 0;
+    let waves = [];
+    let animId = null;
+    let isHover = false;
+    let lastWaveTime = 0;
+
+    function getCursorPos(e) {
+      if (document.caretRangeFromPoint) {
+        try {
+          const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+          if (range && el.contains(range.startContainer)) {
+            let offset = range.startOffset;
+            let node = range.startContainer;
+            let count = 0;
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+            let found = false;
+            while (walker.nextNode()) {
+              if (walker.currentNode === node) {
+                cursorPos = Math.max(0, Math.min(count + offset, totalLen - 1));
+                found = true;
+                break;
+              }
+              count += walker.currentNode.textContent.length;
             }
-            count += walker.currentNode.textContent.length;
+            if (found) return cursorPos;
           }
-          if (found) return;
-        }
-      } catch (err) {}
-    }
-
-    const rect = el.getBoundingClientRect();
-    const relY = Math.max(0, Math.min(0.999, (e.clientY - rect.top) / rect.height));
-    const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const lines = 4;
-    const currentLine = Math.floor(relY * lines);
-    const frac = (currentLine + relX) / lines;
-    cursorPos = Math.max(0, Math.min(Math.floor(frac * totalLen), totalLen - 1));
-  }
-
-  function calcWaveEffect(charIdx, t) {
-    let shouldAnim = false;
-    let resultChar = charData[charIdx].char;
-
-    for (let i = 0; i < waves.length; i++) {
-      const w = waves[i];
-      const age = t - w.startTime;
-      const prog = Math.min(age / dur, 1);
-      const dist = Math.abs(charIdx - w.startPos);
-      const maxDist = Math.max(w.startPos, totalLen - w.startPos - 1);
-      const rad = (prog * (maxDist + WAVE_BUF)) / spread;
-
-      if (dist <= rad) {
-        shouldAnim = true;
-        const intens = Math.max(0, rad - dist);
-
-        if (intens <= WAVE_THRESH && intens > 0) {
-          const index = (dist * CHAR_MULT + Math.floor(age / ANIM_STEP)) % chars.length;
-          resultChar = chars[index];
-        }
+        } catch (err) {}
       }
+
+      // Proportional fallback
+      const rect = el.getBoundingClientRect();
+      const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      cursorPos = Math.max(0, Math.min(Math.floor(relX * totalLen), totalLen - 1));
+      return cursorPos;
     }
 
-    return { shouldAnim, char: resultChar };
-  }
+    function calcWaveEffect(charIdx, t) {
+      let shouldAnim = false;
+      let resultChar = charData[charIdx].char;
 
-  function genScrambledHtml(t) {
-    let html = '';
-    let inHighlight = false;
+      for (let i = 0; i < waves.length; i++) {
+        const w = waves[i];
+        const age = t - w.startTime;
+        const prog = Math.min(age / dur, 1);
+        const dist = Math.abs(charIdx - w.startPos);
+        const maxDist = Math.max(w.startPos, totalLen - w.startPos - 1);
+        const rad = (prog * (maxDist + WAVE_BUF)) / spread;
 
-    for (let i = 0; i < totalLen; i++) {
-      const item = charData[i];
-      let ch = item.char;
+        if (dist <= rad) {
+          shouldAnim = true;
+          const intens = Math.max(0, rad - dist);
 
-      if (preserveSpaces && ch === ' ') {
-        // keep spaces intact
-      } else {
-        const res = calcWaveEffect(i, t);
-        if (res.shouldAnim) {
-          ch = res.char;
+          if (intens <= WAVE_THRESH && intens > 0) {
+            const index = (dist * CHAR_MULT + Math.floor(age / ANIM_STEP)) % chars.length;
+            resultChar = chars[index];
+          }
         }
       }
 
-      if (item.isHighlight && !inHighlight) {
-        html += '<span class="highlight">';
-        inHighlight = true;
-      } else if (!item.isHighlight && inHighlight) {
+      return { shouldAnim, char: resultChar };
+    }
+
+    function genScrambledHtml(t) {
+      let html = '';
+      let inHighlight = false;
+
+      for (let i = 0; i < totalLen; i++) {
+        const item = charData[i];
+        let ch = item.char;
+
+        if (preserveSpaces && ch === ' ') {
+          // Keep space
+        } else {
+          const res = calcWaveEffect(i, t);
+          if (res.shouldAnim) {
+            ch = res.char;
+          }
+        }
+
+        if (item.isHighlight && !inHighlight) {
+          html += '<span class="highlight">';
+          inHighlight = true;
+        } else if (!item.isHighlight && inHighlight) {
+          html += '</span>';
+          inHighlight = false;
+        }
+
+        if (ch === '&') html += '&amp;';
+        else if (ch === '<') html += '&lt;';
+        else if (ch === '>') html += '&gt;';
+        else if (ch === '"') html += '&quot;';
+        else html += ch;
+      }
+
+      if (inHighlight) {
         html += '</span>';
-        inHighlight = false;
       }
 
-      if (ch === '&') html += '&amp;';
-      else if (ch === '<') html += '&lt;';
-      else if (ch === '>') html += '&gt;';
-      else if (ch === '"') html += '&quot;';
-      else html += ch;
+      return html;
     }
 
-    if (inHighlight) {
-      html += '</span>';
+    function stop() {
+      el.innerHTML = origHtml;
+      el.classList.remove('as');
+      isAnim = false;
+      waves = [];
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
     }
 
-    return html;
-  }
+    function start() {
+      if (isAnim) return;
+      isAnim = true;
+      el.classList.add('as');
 
-  function stop() {
-    el.innerHTML = origHtml;
-    el.classList.remove('as');
-    isAnim = false;
-    if (animId) {
-      cancelAnimationFrame(animId);
-      animId = null;
-    }
-  }
+      function animateWave() {
+        const t = Date.now();
+        waves = waves.filter((w) => t - w.startTime < dur);
 
-  function start() {
-    if (isAnim) return;
-    isAnim = true;
-    el.classList.add('as');
+        if (waves.length === 0) {
+          stop();
+          return;
+        }
 
-    function animateWave() {
-      const t = Date.now();
-      waves = waves.filter((w) => t - w.startTime < dur);
-
-      if (waves.length === 0) {
-        stop();
-        return;
+        el.innerHTML = genScrambledHtml(t);
+        animId = requestAnimationFrame(animateWave);
       }
 
-      el.innerHTML = genScrambledHtml(t);
       animId = requestAnimationFrame(animateWave);
     }
 
-    animId = requestAnimationFrame(animateWave);
-  }
+    function startWave(pos) {
+      const startPos = (typeof pos === 'number') ? pos : cursorPos;
+      waves.push({
+        startPos: startPos,
+        startTime: Date.now(),
+        id: Math.random()
+      });
+      lastWaveTime = Date.now();
 
-  function startWave(customStartPos) {
-    const startPos = (typeof customStartPos === 'number') ? customStartPos : cursorPos;
-    waves.push({
-      startPos: startPos,
-      startTime: Date.now(),
-      id: Math.random()
+      if (!isAnim) start();
+    }
+
+    // ONLY this specific line triggers when cursor is brought on it
+    el.addEventListener('mouseenter', (e) => {
+      isHover = true;
+      const pos = getCursorPos(e);
+      startWave(pos);
     });
 
-    if (!isAnim) start();
-  }
-
-  // Interactive mouse handlers on the bio card
-  card.addEventListener('mouseenter', (e) => {
-    isHover = true;
-    updateCursorPos(e);
-    startWave();
-  });
-
-  card.addEventListener('mousemove', (e) => {
-    if (!isHover) return;
-    const old = cursorPos;
-    updateCursorPos(e);
-    if (Math.abs(cursorPos - old) >= 3) {
-      startWave();
-    }
-  });
-
-  card.addEventListener('mouseleave', () => {
-    isHover = false;
-  });
-
-  card.addEventListener('click', (e) => {
-    updateCursorPos(e);
-    startWave();
-  });
-
-  // Auto-ripple once when About section scrolls into viewport
-  const aboutObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting && !autoTriggered) {
-        autoTriggered = true;
-        setTimeout(() => {
-          startWave(0);
-        }, 350);
+    el.addEventListener('mousemove', (e) => {
+      if (!isHover) return;
+      const oldPos = cursorPos;
+      const pos = getCursorPos(e);
+      const now = Date.now();
+      // Throttle waves so mouse movements remain smooth and serene
+      if (now - lastWaveTime > 600 && Math.abs(pos - oldPos) >= 5) {
+        startWave(pos);
       }
     });
-  }, { threshold: 0.3 });
 
-  const aboutSec = document.getElementById('about');
-  if (aboutSec) aboutObserver.observe(aboutSec);
+    el.addEventListener('mouseleave', () => {
+      isHover = false;
+    });
+
+    el.addEventListener('click', (e) => {
+      const pos = getCursorPos(e);
+      startWave(pos);
+    });
+  }
 }
 
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {
