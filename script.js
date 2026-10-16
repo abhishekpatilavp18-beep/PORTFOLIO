@@ -369,19 +369,21 @@ function morphText(fromText, toText, duration, onComplete) {
 // 5. "ABHISHEK" scramble-morphs into "PORTFOLIO"
 // =========================================
 function runEntrySequence() {
-  // Step 1: The DOT falls from the top with gravity, bounces on the floor, and casts shadow (150ms)
+  // Step 1: The DOT (ball) falls from the top with gravity, bounces on the floor, and settles (150ms)
   setTimeout(() => {
     iDot.classList.add('drop-bounce');
     iFloorShadow.classList.add('active-shadow');
   }, 150);
 
-  // Step 2: The body BAR falls from the top right after, lands and spring-bounces (450ms)
+  // Step 2: ONLY AFTER the ball has fallen and settled, the body BAR falls from the top, lands and spring-bounces (1150ms)
   setTimeout(() => {
     iBar.classList.add('drop-bounce');
-  }, 450);
+    iFloorShadow.classList.remove('active-shadow');
+    void iFloorShadow.offsetWidth;
+    iFloorShadow.classList.add('bar-shadow');
+  }, 1150);
 
-  // Step 3: "i" is completely settled & FIXED in center.
-  // "ABH" on the left scramble-morphs in gracefully (1400ms, duration: 850ms)
+  // Step 3: Once both the ball and bar of "i" have fully landed and settled, "ABH" on the left scramble-morphs in (2200ms, duration: 850ms)
   setTimeout(() => {
     scrambleReveal(prefixText, 'ABH', 850, () => {
       // Step 4: "SHEK" on the right scramble-morphs in gracefully (duration: 900ms)
@@ -426,7 +428,7 @@ function runEntrySequence() {
         });
       }, 150);
     });
-  }, 1400);
+  }, 2200);
 }
 
 // Handle both fresh load and cached load reliably

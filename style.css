@@ -256,6 +256,10 @@ body.intro-finished {
   animation: shadowBounce 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
+.i-floor-shadow.bar-shadow {
+  animation: barShadowBounce 1.1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
 @keyframes shadowBounce {
   0% { transform: translateX(-50%) scale(0); opacity: 0; }
   35% { transform: translateX(-50%) scale(1.4); opacity: 0.9; }
@@ -265,8 +269,17 @@ body.intro-finished {
   100% { transform: translateX(-50%) scale(1); opacity: 0.7; }
 }
 
-/* Dot: Falls first from the top and bounces */
+@keyframes barShadowBounce {
+  0% { transform: translateX(-50%) scale(0.6); opacity: 0.3; }
+  45% { transform: translateX(-50%) scale(1.6); opacity: 1; }
+  65% { transform: translateX(-50%) scale(0.85); opacity: 0.6; }
+  85% { transform: translateX(-50%) scale(1.2); opacity: 0.85; }
+  100% { transform: translateX(-50%) scale(1); opacity: 0.7; }
+}
+
+/* Dot: Falls FIRST from the top, hits floor and bounces */
 .i-dot {
+  order: 1;
   width: clamp(16px, 1.9vw, 26px);
   height: clamp(16px, 1.9vw, 26px);
   background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
@@ -306,8 +319,9 @@ body.intro-finished {
   }
 }
 
-/* Bar: Falls right after the dot and bounces */
+/* Bar: Falls AFTER the dot has settled, then lands and bounces */
 .i-bar {
+  order: 2;
   width: clamp(16px, 1.9vw, 26px);
   height: clamp(52px, 6.8vw, 86px);
   background: linear-gradient(180deg, #ffffff 0%, #9ca3af 100%);
