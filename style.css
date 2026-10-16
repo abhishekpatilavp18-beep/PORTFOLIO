@@ -204,6 +204,11 @@ html, body {
   margin: 0 clamp(4px, 0.6vw, 10px);
   vertical-align: middle;
   transform-origin: center bottom;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.i-letter-wrap.dock-impact {
+  transform: scale(1.12);
 }
 
 /* Floor Shadow below the landing point */
@@ -334,26 +339,31 @@ html, body {
 }
 
 /* =========================================
-   ATTACHING LETTERS: "ABH" (LEFT) & "SHEK" (RIGHT)
+   ATTACHING LETTERS: "ABH" (FROM LEFT SCREEN) & "SHEK" (FROM RIGHT SCREEN)
    ========================================= */
 .anim-letter-group {
   display: inline-block;
   opacity: 0;
-  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.9));
+  will-change: transform, opacity;
+  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.9));
 }
 
+/* Start completely off-screen on the far left and right edges */
 .anim-letter-group.slide-left {
-  transform: translateX(-150px);
+  transform: translateX(-65vw);
+  opacity: 0;
 }
 
 .anim-letter-group.slide-right {
-  transform: translateX(150px);
+  transform: translateX(65vw);
+  opacity: 0;
 }
 
+/* Fly smoothly across the screen and dock onto the "i" */
 .anim-letter-group.attached {
-  opacity: 1;
-  transform: translateX(0);
-  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  transform: translateX(0) !important;
+  opacity: 1 !important;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
 }
 
 /* =========================================

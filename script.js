@@ -321,7 +321,7 @@ function morphText(fromText, toText, duration, onComplete) {
 }
 
 // =========================================
-// ENTRY ANIMATION TIMELINE: FALLING "i" WITH BOUNCE & SHADOWS
+// ENTRY ANIMATION TIMELINE: FALLING "i" + CROSS-SCREEN FLIGHT OF "ABH" & "SHEK"
 // =========================================
 function runEntrySequence() {
   // Step 1: The DOT falls from the top with gravity, bounces on the floor, and casts shadow (150ms)
@@ -335,28 +335,30 @@ function runEntrySequence() {
     iBar.classList.add('drop-bounce');
   }, 450);
 
-  // Step 3: "ABH" slides in from the left, "SHEK" slides in from the right to attach to "i" (1400ms)
+  // Step 3: "ABH" flies in from the left screen, "SHEK" flies in from the right screen (1350ms)
   setTimeout(() => {
-    prefixText.textContent = 'ABH';
-    suffixText.textContent = 'SHEK';
     prefixText.classList.add('attached');
     suffixText.classList.add('attached');
-  }, 1400);
+  }, 1350);
 
-  // Step 4: As letters dock, fuse dot & bar into solid uppercase "I" (2050ms) -> "ABHISHEK"
+  // Step 4: As letters dock onto "i", trigger landing impulse and fuse into solid uppercase "I" (2100ms)
   setTimeout(() => {
+    iLetterWrap.classList.add('dock-impact');
     iLetterWrap.classList.add('fused');
-  }, 2050);
+    setTimeout(() => {
+      iLetterWrap.classList.remove('dock-impact');
+    }, 300);
+  }, 2100);
 
-  // Step 5: Morph "ABHISHEK" -> "PORTFOLIO" (2800ms)
+  // Step 5: Morph "ABHISHEK" -> "PORTFOLIO" (2850ms)
   setTimeout(() => {
     giantTitle.innerHTML = 'ABHISHEK';
     morphText('ABHISHEK', 'PORTFOLIO', 750, () => {
-      // Step 6: "PORTFOLIO" glides smoothly down to bottom position (3650ms)
+      // Step 6: "PORTFOLIO" glides smoothly down to bottom position (3700ms)
       setTimeout(() => {
         heroCenter.classList.add('in-position');
 
-        // Step 7: Reveal navbar, footer, and trigger cosmic particle assembly (4100ms)
+        // Step 7: Reveal navbar, footer, and trigger cosmic particle assembly (4150ms)
         setTimeout(() => {
           mainNavbar.classList.remove('intro-hidden');
           mainNavbar.classList.add('intro-visible');
@@ -375,7 +377,7 @@ function runEntrySequence() {
         }, 450);
       }, 150);
     });
-  }, 2800);
+  }, 2850);
 }
 
 // Handle both fresh load and cached load reliably
