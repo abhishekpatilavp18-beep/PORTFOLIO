@@ -11,8 +11,8 @@
 </head>
 <body>
 
-  <!-- Navigation -->
-  <header class="navbar">
+  <!-- Navigation (Hidden initially, slides in during intro) -->
+  <header class="navbar intro-hidden" id="mainNavbar">
     <a href="#home" class="logo">ABHISHEK</a>
     <nav class="nav-links">
       <a href="#home" class="nav-link active">HOME</a>
@@ -26,16 +26,25 @@
 
   <!-- Hero Section -->
   <main class="hero-section" id="home">
-    <!-- Background Canvas for Interactive Pixel/Particle Portrait & Ambient Dust -->
+    <!-- Particle Canvas in Pure Black Background -->
     <canvas id="particleCanvas"></canvas>
 
     <!-- Overlay Titles & Badges -->
     <div class="hero-foreground">
-      <div class="hero-center">
-        <h1 class="giant-portfolio-text">PORTFOLIO</h1>
+      <!-- Animated Title (Starts Center Screen for Intro, Slides to Bottom) -->
+      <div class="hero-center intro-center" id="heroCenter">
+        <h1 class="giant-portfolio-text" id="giantTitle">
+          <span class="anim-letter-group" id="prefixText"></span>
+          <span class="excl-mark-wrap" id="exclWrap">
+            <span class="excl-bar"></span>
+            <span class="excl-dot"></span>
+          </span>
+          <span class="anim-letter-group" id="suffixText"></span>
+        </h1>
       </div>
 
-      <div class="hero-footer-bar">
+      <!-- Bottom Info Bar (Fades in during intro) -->
+      <div class="hero-footer-bar intro-hidden" id="heroFooter">
         <div class="hero-role-wrapper">
           <span class="role-bold">Full Stack</span>
           <span class="role-italic">Developer</span>
@@ -60,8 +69,8 @@
       </div>
     </div>
 
-    <!-- Quick Interaction Guide Hint -->
-    <div class="interaction-hint">
+    <!-- Micro-interaction hint -->
+    <div class="interaction-hint intro-hidden" id="interactionHint">
       <span class="pulse-dot"></span> Hover over the portrait to disperse particles • Click to scatter
     </div>
   </main>
