@@ -475,12 +475,16 @@ body {
   padding: clamp(32px, 4.2vw, 56px);
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(16px);
-  transition: border-color 0.3s ease, transform 0.3s ease;
+  transition: border-color 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .bio-card:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-3px);
+  box-shadow: 0 35px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(255, 255, 255, 0.04);
 }
 
 .bio-text {
@@ -488,11 +492,21 @@ body {
   line-height: 1.85;
   color: #848c9e;
   font-weight: 400;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.bio-text.as {
+  /* Subtle glitch glow when ripple wave is active */
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .bio-text .highlight {
   color: #ffffff;
   font-weight: 700;
+  transition: color 0.15s ease;
 }
 
 /* =========================================

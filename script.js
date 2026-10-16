@@ -422,6 +422,7 @@ function initApp() {
   animate();
   runEntrySequence();
   initNavObserver();
+  initAsciiGlitchRipple();
 }
 
 // Update active navbar link on scroll
@@ -448,6 +449,234 @@ function initNavObserver() {
       }
     });
   }, { passive: true });
+}
+
+/* =========================================
+   ASCII GLITCH RIPPLE (Vengeance UI)
+   Interactive wave distortion for About Me content
+   ========================================= */
+function initAsciiGlitchRipple() {
+  const el = document.getElementById('bioText');
+  const card = document.getElementById('bioCard');
+  if (!el || !card) return;
+
+  const origHtml = el.innerHTML;
+
+  // Extract character data while preserving <span class="highlight"> markup
+  const charData = [];
+  el.childNodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const txt = node.textContent;
+      for (let i = 0; i < txt.length; i++) {
+        charData.push({ char: txt[i], isHighlight: false });
+      }
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const isHighlight = node.classList.contains('highlight');
+      const txt = node.textContent;
+      for (let i = 0; i < txt.length; i++) {
+        charData.push({ char: txt[i], isHighlight: isHighlight });
+      }
+    }
+  });
+
+  const totalLen = charData.length;
+  if (totalLen === 0) return;
+
+  // Wave ripple constants from Vengeance UI
+  const WAVE_THRESH = 3;
+  const CHAR_MULT = 3;
+  const ANIM_STEP = 40;
+  const WAVE_BUF = 5;
+  const dur = 1000;
+  const chars = '.,·-─~+:;=*π""┐┌┘┴┬╗╔╝╚╬╠╣╩╦║░▒▓█▄▀▌▐■!?&#$@0123456789*';
+  const preserveSpaces = true;
+  const spread = 1.1;
+
+  let isAnim = false;
+  let cursorPos = 0;
+  let waves = [];
+  let animId = null;
+  let isHover = false;
+  let autoTriggered = false;
+
+  function updateCursorPos(e) {
+    if (document.caretRangeFromPoint) {
+      try {
+        const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        if (range && el.contains(range.startContainer)) {
+          let offset = range.startOffset;
+          let node = range.startContainer;
+          let count = 0;
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+          let found = false;
+          while (walker.nextNode()) {
+            if (walker.currentNode === node) {
+              cursorPos = Math.max(0, Math.min(count + offset, totalLen - 1));
+              found = true;
+              break;
+            }
+            count += walker.currentNode.textContent.length;
+          }
+          if (found) return;
+        }
+      } catch (err) {}
+    }
+
+    const rect = el.getBoundingClientRect();
+    const relY = Math.max(0, Math.min(0.999, (e.clientY - rect.top) / rect.height));
+    const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const lines = 4;
+    const currentLine = Math.floor(relY * lines);
+    const frac = (currentLine + relX) / lines;
+    cursorPos = Math.max(0, Math.min(Math.floor(frac * totalLen), totalLen - 1));
+  }
+
+  function calcWaveEffect(charIdx, t) {
+    let shouldAnim = false;
+    let resultChar = charData[charIdx].char;
+
+    for (let i = 0; i < waves.length; i++) {
+      const w = waves[i];
+      const age = t - w.startTime;
+      const prog = Math.min(age / dur, 1);
+      const dist = Math.abs(charIdx - w.startPos);
+      const maxDist = Math.max(w.startPos, totalLen - w.startPos - 1);
+      const rad = (prog * (maxDist + WAVE_BUF)) / spread;
+
+      if (dist <= rad) {
+        shouldAnim = true;
+        const intens = Math.max(0, rad - dist);
+
+        if (intens <= WAVE_THRESH && intens > 0) {
+          const index = (dist * CHAR_MULT + Math.floor(age / ANIM_STEP)) % chars.length;
+          resultChar = chars[index];
+        }
+      }
+    }
+
+    return { shouldAnim, char: resultChar };
+  }
+
+  function genScrambledHtml(t) {
+    let html = '';
+    let inHighlight = false;
+
+    for (let i = 0; i < totalLen; i++) {
+      const item = charData[i];
+      let ch = item.char;
+
+      if (preserveSpaces && ch === ' ') {
+        // keep spaces intact
+      } else {
+        const res = calcWaveEffect(i, t);
+        if (res.shouldAnim) {
+          ch = res.char;
+        }
+      }
+
+      if (item.isHighlight && !inHighlight) {
+        html += '<span class="highlight">';
+        inHighlight = true;
+      } else if (!item.isHighlight && inHighlight) {
+        html += '</span>';
+        inHighlight = false;
+      }
+
+      if (ch === '&') html += '&amp;';
+      else if (ch === '<') html += '&lt;';
+      else if (ch === '>') html += '&gt;';
+      else if (ch === '"') html += '&quot;';
+      else html += ch;
+    }
+
+    if (inHighlight) {
+      html += '</span>';
+    }
+
+    return html;
+  }
+
+  function stop() {
+    el.innerHTML = origHtml;
+    el.classList.remove('as');
+    isAnim = false;
+    if (animId) {
+      cancelAnimationFrame(animId);
+      animId = null;
+    }
+  }
+
+  function start() {
+    if (isAnim) return;
+    isAnim = true;
+    el.classList.add('as');
+
+    function animateWave() {
+      const t = Date.now();
+      waves = waves.filter((w) => t - w.startTime < dur);
+
+      if (waves.length === 0) {
+        stop();
+        return;
+      }
+
+      el.innerHTML = genScrambledHtml(t);
+      animId = requestAnimationFrame(animateWave);
+    }
+
+    animId = requestAnimationFrame(animateWave);
+  }
+
+  function startWave(customStartPos) {
+    const startPos = (typeof customStartPos === 'number') ? customStartPos : cursorPos;
+    waves.push({
+      startPos: startPos,
+      startTime: Date.now(),
+      id: Math.random()
+    });
+
+    if (!isAnim) start();
+  }
+
+  // Interactive mouse handlers on the bio card
+  card.addEventListener('mouseenter', (e) => {
+    isHover = true;
+    updateCursorPos(e);
+    startWave();
+  });
+
+  card.addEventListener('mousemove', (e) => {
+    if (!isHover) return;
+    const old = cursorPos;
+    updateCursorPos(e);
+    if (Math.abs(cursorPos - old) >= 3) {
+      startWave();
+    }
+  });
+
+  card.addEventListener('mouseleave', () => {
+    isHover = false;
+  });
+
+  card.addEventListener('click', (e) => {
+    updateCursorPos(e);
+    startWave();
+  });
+
+  // Auto-ripple once when About section scrolls into viewport
+  const aboutObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && !autoTriggered) {
+        autoTriggered = true;
+        setTimeout(() => {
+          startWave(0);
+        }, 350);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const aboutSec = document.getElementById('about');
+  if (aboutSec) aboutObserver.observe(aboutSec);
 }
 
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {
