@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+  <!-- GSAP & ScrollTrigger for Staggered Grid Scroll Animation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
@@ -17,7 +20,7 @@
     <nav class="nav-links">
       <a href="#home" class="nav-link active" id="navHome">HOME</a>
       <a href="#about" class="nav-link" id="navAbout">ABOUT</a>
-      <a href="#service" class="nav-link">SERVICE</a>
+      <a href="#skills" class="nav-link" id="navSkills">SKILLS</a>
       <a href="#project" class="nav-link">PROJECT</a>
       <a href="#components" class="nav-link">COMPONENTS</a>
       <a href="#contact" class="nav-link">CONTACT</a>
@@ -70,6 +73,312 @@
             Hey, I’m a <span class="highlight">passionate Computer Science student</span> who loves building <span class="highlight">modern, user-friendly websites and applications</span>. I enjoy learning <span class="highlight">new technologies</span>, <span class="highlight">solving problems</span>, and turning creative ideas into <span class="highlight">real-world projects</span>. I’m constantly improving my skills in <span class="highlight">web development and programming</span>, with a goal of building <span class="highlight">impactful digital experiences</span> through clean code and creative design.
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section with Staggered Grid Scroll Animation (Vengeance UI) -->
+  <section class="skills-section" id="skills">
+    <div class="skills-header">
+      <span class="section-badge">TECH STACK</span>
+      <h2 class="staggered-title" id="staggeredTitle">SKILLS</h2>
+    </div>
+
+    <!-- Staggered 7-Column Parallax Grid -->
+    <div class="staggered-grid-wrapper">
+      <div class="grid--full" id="staggeredGrid">
+        
+        <!-- Row 1 -->
+        <figure class="grid__item" data-col="0">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" alt="C" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Language</span>
+                <span class="skill-name">C</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="1">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" alt="C++" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Language</span>
+                <span class="skill-name">C++</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="2">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Language</span>
+                <span class="skill-name">Python</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="3">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Language</span>
+                <span class="skill-name">Java</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="4">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Structure</span>
+                <span class="skill-name">HTML</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="5">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Styling</span>
+                <span class="skill-name">CSS</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="6">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Language</span>
+                <span class="skill-name">JavaScript</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <!-- Row 2 -->
+        <figure class="grid__item" data-col="0">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React.js" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Frontend</span>
+                <span class="skill-name">React.js</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="1">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Runtime</span>
+                <span class="skill-name">Node.js</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="2">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" alt="Express.js" class="skill-icon" style="filter: invert(1);" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Backend</span>
+                <span class="skill-name">Express.js</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="3">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" alt="MongoDB" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Database</span>
+                <span class="skill-name">MongoDB</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="4">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Database</span>
+                <span class="skill-name">MySQL</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="5">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" alt="Prisma" class="skill-icon" style="filter: invert(1);" />
+              <div class="skill-reveal">
+                <span class="skill-sub">ORM</span>
+                <span class="skill-name">Prisma</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="6">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">VCS</span>
+                <span class="skill-name">Git</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <!-- Row 3: Skills + Center Bento Group -->
+        <figure class="grid__item" data-col="0">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" class="skill-icon" style="filter: invert(1);" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Platform</span>
+                <span class="skill-name">GitHub</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="1">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Editor</span>
+                <span class="skill-name">VS Code</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <!-- Center Bento Group (Spans Columns 2, 3, 4) -->
+        <div class="grid__item bento-container" data-col="2">
+          <!-- Bento 1: Frontend -->
+          <div class="bento-card active" data-bento="0">
+            <div class="bento-border"></div>
+            <div class="bento-active-content">
+              <div class="bento-badge-tag">FOCUS 01</div>
+              <h3 class="bento-title">Frontend Stack</h3>
+              <p class="bento-desc">React.js, Modern JavaScript, HTML5 & Responsive CSS UI</p>
+              <div class="bento-icons-row">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React" />
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JS" />
+              </div>
+            </div>
+            <div class="bento-inactive-content">
+              <span class="bento-pill">FRONTEND</span>
+            </div>
+          </div>
+
+          <!-- Bento 2: Backend -->
+          <div class="bento-card" data-bento="1">
+            <div class="bento-border"></div>
+            <div class="bento-active-content">
+              <div class="bento-badge-tag">FOCUS 02</div>
+              <h3 class="bento-title">Backend Architecture</h3>
+              <p class="bento-desc">Node.js, Express APIs, Python & Java Enterprise</p>
+              <div class="bento-icons-row">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node" />
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" />
+              </div>
+            </div>
+            <div class="bento-inactive-content">
+              <span class="bento-pill">BACKEND</span>
+            </div>
+          </div>
+
+          <!-- Bento 3: Databases & Tools -->
+          <div class="bento-card" data-bento="2">
+            <div class="bento-border"></div>
+            <div class="bento-active-content">
+              <div class="bento-badge-tag">FOCUS 03</div>
+              <h3 class="bento-title">Data & Design</h3>
+              <p class="bento-desc">MongoDB, MySQL, Prisma ORM, Git & Figma</p>
+              <div class="bento-icons-row">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" alt="MongoDB" />
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" />
+              </div>
+            </div>
+            <div class="bento-inactive-content">
+              <span class="bento-pill">DATA & TOOLS</span>
+            </div>
+          </div>
+        </div>
+
+        <figure class="grid__item" data-col="5">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">UI/UX</span>
+                <span class="skill-name">Figma</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <figure class="grid__item" data-col="6">
+          <div class="grid__item-img">
+            <div class="item-overlay"></div>
+            <div class="item-content">
+              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/canva/canva-original.svg" alt="Canva" class="skill-icon" />
+              <div class="skill-reveal">
+                <span class="skill-sub">Design</span>
+                <span class="skill-name">Canva</span>
+              </div>
+            </div>
+          </div>
+        </figure>
+
       </div>
     </div>
   </section>

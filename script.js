@@ -436,6 +436,7 @@ function initApp() {
   runEntrySequence();
   initNavObserver();
   initAsciiGlitchRipple();
+  initStaggeredGrid();
 }
 
 // Update active navbar link on scroll
@@ -793,6 +794,92 @@ function initAsciiGlitchRipple() {
     resizeTimer = setTimeout(() => {
       buildVisualLines();
     }, 250);
+  });
+}
+
+/* =========================================
+   STAGGERED GRID SCROLL ANIMATION (Vengeance UI)
+   7-Column Offset Parallax + Expanding Bento
+   ========================================= */
+function initStaggeredGrid() {
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const grid = document.getElementById('staggeredGrid');
+  const title = document.getElementById('staggeredTitle');
+  if (!grid || !title) return;
+
+  // 1. Split Title into individual character spans
+  const text = title.textContent.trim();
+  title.innerHTML = text.split('').map((char) =>
+    `<span class="char">${char === ' ' ? '&nbsp;' : char}</span>`
+  ).join('');
+
+  const chars = title.querySelectorAll('.char');
+
+  // GSAP Title Entrance scrubbed with scroll
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: title,
+      start: 'top 85%',
+      end: 'center 45%',
+      scrub: 1,
+    }
+  }).from(chars, {
+    ease: 'sine.out',
+    yPercent: 180,
+    autoAlpha: 0,
+    stagger: {
+      each: 0.05,
+      from: 'center'
+    }
+  });
+
+  // 2. Animate 7 Columns with Staggered Parallax
+  const gridItems = grid.querySelectorAll('.grid__item');
+  const numColumns = 7;
+  const middleColumnIndex = 3;
+  const columns = Array.from({ length: numColumns }, () => []);
+
+  gridItems.forEach((item) => {
+    const colAttr = item.getAttribute('data-col');
+    const colIndex = colAttr !== null ? parseInt(colAttr, 10) : 0;
+    if (columns[colIndex]) {
+      columns[colIndex].push(item);
+    }
+  });
+
+  columns.forEach((columnItems, columnIndex) => {
+    if (columnItems.length === 0) return;
+    const delayFactor = Math.abs(columnIndex - middleColumnIndex) * 0.15;
+
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: grid,
+        start: 'top 90%',
+        end: 'center 50%',
+        scrub: 1.5,
+      }
+    }).from(columnItems, {
+      yPercent: 260,
+      autoAlpha: 0,
+      delay: delayFactor,
+      ease: 'sine.out',
+    });
+  });
+
+  // 3. Interactive Bento Card Expansion on Hover
+  const bentoCards = grid.querySelectorAll('.bento-card');
+  bentoCards.forEach((card) => {
+    card.addEventListener('mouseenter', () => {
+      bentoCards.forEach((c) => c.classList.remove('active'));
+      card.classList.add('active');
+    });
+    card.addEventListener('click', () => {
+      bentoCards.forEach((c) => c.classList.remove('active'));
+      card.classList.add('active');
+    });
   });
 }
 
