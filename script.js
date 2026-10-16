@@ -440,6 +440,7 @@ function initApp() {
   initBooksShowcase();
   initWaveGridBackground();
   initSocialFlipButton();
+  initBreakoutGame();
 }
 
 // Update active navbar link on scroll
@@ -2345,6 +2346,511 @@ function initSocialFlipButton() {
       btn.classList.toggle('touch-active');
     }
   }, { passive: true });
+}
+
+/* =========================================
+   BREAKOUT GAME: "HELLO WORLD" HEADLINE
+   Interactive Pixel Brick Breaker
+   ========================================= */
+function initBreakoutGame() {
+  const panel = document.getElementById('breakoutPanel');
+  const canvas = document.getElementById('breakoutCanvas');
+  const livesContainer = document.getElementById('breakoutLives');
+  const statusText = document.getElementById('breakoutStatus');
+  const actionBtn = document.getElementById('breakoutActionBtn');
+
+  if (!panel || !canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const lines = ['HELLO', 'WORLD'];
+  const startingLives = 3;
+  const speedMultiplier = 1.0;
+
+  const BRICK_EMPTY = 0;
+  const BRICK_SOLID = 1;
+  const BRICK_BROKEN = 2;
+  const LETTER_W = 5;
+  const LETTER_H = 7;
+  const LETTER_SPACING = 1;
+  const LINE_SPACING = 3;
+  const REGROW_DELAY = 1.4;
+
+  const PIXEL_FONT = {
+    A: `.###./#...#/#...#/#####/#...#/#...#/#...#`,
+    B: `####./#...#/#...#/####./#...#/#...#/####.`,
+    C: `.####/#..../#..../#..../#..../#..../.####`,
+    D: `####./#...#/#...#/#...#/#...#/#...#/####.`,
+    E: `#####/#..../#..../####./#..../#..../#####`,
+    F: `#####/#..../#..../####./#..../#..../#....`,
+    G: `.###./#...#/#..../#..##/#...#/#...#/.###.`,
+    H: `#...#/#...#/#...#/#####/#...#/#...#/#...#`,
+    I: `#####/..#../..#../..#../..#../..#../#####`,
+    J: `..###/...#./...#./...#./...#./#..#./.##..`,
+    K: `#...#/#..#./#.#../##.../#.#../#..#./#...#`,
+    L: `#..../#..../#..../#..../#..../#..../#####`,
+    M: `#...#/##.##/#.#.#/#...#/#...#/#...#/#...#`,
+    N: `#...#/##..#/#.#.#/#..##/#...#/#...#/#...#`,
+    O: `.###./#...#/#...#/#...#/#...#/#...#/.###.`,
+    P: `####./#...#/#...#/####./#..../#..../#....`,
+    Q: `.###./#...#/#...#/#...#/#.#.#/#..#./.##.#`,
+    R: `####./#...#/#...#/####./#.#../#..#./#...#`,
+    S: `.####/#..../#..../.###./....#/....#/####.`,
+    T: `#####/..#../..#../..#../..#../..#../..#..`,
+    U: `#...#/#...#/#...#/#...#/#...#/#...#/.###.`,
+    V: `#...#/#...#/#...#/#...#/#...#/.#.#./..#..`,
+    W: `#...#/#...#/#...#/#...#/#.#.#/##.##/#...#`,
+    X: `#...#/#...#/.#.#./..#../.#.#./#...#/#...#`,
+    Y: `#...#/#...#/.#.#./..#../..#../..#../..#..`,
+    Z: `#####/....#/...#./..#../.#.../#..../#####`,
+    0: `.###./#...#/#..##/#.#.#/##..#/#...#/.###.`,
+    1: `..#../.##../..#../..#../..#../..#../.###.`,
+    2: `.###./#...#/....#/...#./..#../.#.../#####`,
+    3: `#####/...#./..#../...#./....#/#...#/.###.`,
+    4: `...#./..##./.#.#./#..#./#####/...#./...#.`,
+    5: `#####/#..../####./....#/....#/#...#/.###.`,
+    6: `..##./.#.../#..../####./#...#/#...#/.###.`,
+    7: `#####/....#/...#./..#../.#.../.#.../.#...`,
+    8: `.###./#...#/#...#/.###./#...#/#...#/.###.`,
+    9: `.###./#...#/#...#/.####/....#/...#./.##..`,
+    '.': `...../...../...../...../...../.##../.##..`,
+    '!': `..#../..#../..#../..#../..#../...../..#..`
+  };
+
+  const clampVal = (val, min, max) => Math.min(max, Math.max(min, val));
+  const measureLine = (str) => Math.max(0, str.length * 6 - 1);
+  const measureGrid = (arr) => ({
+    w: Math.max(1, ...arr.map(measureLine)),
+    h: arr.length * LETTER_H + (arr.length - 1) * LINE_SPACING
+  });
+
+  function buildGrid(linesArr, cols, rows, yRatio) {
+    const grid = new Uint8Array(cols * rows);
+    const dims = measureGrid(linesArr);
+    const startY = Math.max(0, Math.round(rows * yRatio - dims.h / 2));
+
+    linesArr.forEach((line, lineIdx) => {
+      const lineW = measureLine(line);
+      const startX = Math.round((cols - lineW) / 2);
+      const rowY = startY + lineIdx * 10;
+
+      Array.from(line.toUpperCase()).forEach((char, charIdx) => {
+        const glyph = PIXEL_FONT[char];
+        if (!glyph) return;
+        const colX = startX + charIdx * 6;
+        glyph.split('/').forEach((glyphRow, rIdx) => {
+          for (let cIdx = 0; cIdx < LETTER_W; cIdx++) {
+            if (glyphRow[cIdx] !== '#') continue;
+            const x = colX + cIdx;
+            const y = rowY + rIdx;
+            if (x >= 0 && x < cols && y >= 0 && y < rows) {
+              grid[y * cols + x] = BRICK_SOLID;
+            }
+          }
+        });
+      });
+    });
+
+    return grid;
+  }
+
+  let state = null;
+  let animId = 0;
+  let isPanelVisible = false;
+  let isDocVisible = true;
+
+  function renderLayer() {
+    if (!state) return;
+    const { layerCtx, cell, gap, cols, rows, grid, ox, oy } = state;
+    layerCtx.clearRect(0, 0, state.width, state.height);
+    const brickSize = cell - gap;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const val = grid[r * cols + c];
+        if (val !== BRICK_EMPTY) {
+          layerCtx.fillStyle = val === BRICK_SOLID ? '#f2efe9' : 'rgba(242, 239, 233, 0.08)';
+          layerCtx.fillRect(ox + c * cell, oy + r * cell, brickSize, brickSize);
+        }
+      }
+    }
+    state.layerDirty = false;
+  }
+
+  function renderFrame() {
+    if (!state) return;
+    if (state.layerDirty) renderLayer();
+
+    ctx.clearRect(0, 0, state.width, state.height);
+    ctx.drawImage(state.layer, 0, 0, state.width, state.height);
+
+    if (state.phase !== 'playing' && state.phase !== 'attract') return;
+
+    const { paddle, ball, radius } = state;
+    ctx.fillStyle = state.accent;
+
+    // Paddle
+    const px = paddle.x - paddle.w / 2;
+    if (ctx.roundRect) {
+      ctx.beginPath();
+      ctx.roundRect(px, paddle.y, paddle.w, paddle.h, paddle.h / 2);
+      ctx.fill();
+    } else {
+      ctx.fillRect(px, paddle.y, paddle.w, paddle.h);
+    }
+
+    // Ball
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function updateUI() {
+    if (!state) return;
+    const isPlaying = state.phase === 'playing';
+
+    if (isPlaying) {
+      panel.classList.add('is-playing');
+      livesContainer.classList.add('active');
+    } else {
+      panel.classList.remove('is-playing');
+      livesContainer.classList.remove('active');
+    }
+
+    if (livesContainer) {
+      const dots = livesContainer.querySelectorAll('.life-dot');
+      dots.forEach((dot, idx) => {
+        dot.className = `life-dot ${idx < state.lives ? 'alive' : ''}`;
+      });
+    }
+
+    if (state.phase === 'over') {
+      statusText.textContent = 'OUT OF BALLS';
+      statusText.className = 'breakout-status-text show';
+      actionBtn.textContent = 'AGAIN';
+    } else if (state.phase === 'won') {
+      statusText.textContent = 'CLEARED';
+      statusText.className = 'breakout-status-text show won';
+      actionBtn.textContent = 'AGAIN';
+    } else if (state.phase === 'playing') {
+      statusText.className = 'breakout-status-text';
+      actionBtn.textContent = 'PLAY';
+    } else {
+      statusText.className = 'breakout-status-text';
+      actionBtn.textContent = 'PLAY';
+    }
+  }
+
+  function resetBoard(forcePlay = false) {
+    const rect = panel.getBoundingClientRect();
+    const w = Math.round(rect.width);
+    const h = Math.round(rect.height);
+    if (w < 40 || h < 40) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${h}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const dims = measureGrid(lines);
+    const scale = Math.min(w * (w < 520 ? 0.94 : 0.88) / dims.w, h * 0.56 / dims.h);
+    const cellSize = clampVal(Math.floor(scale), 4, 26);
+    const cols = Math.floor(w / cellSize);
+    const rows = Math.floor(h / cellSize);
+    const grid = buildGrid(lines, cols, rows, clampVal(0.3 + (h / w) * 0.12, 0.3, 0.44));
+
+    let standingCount = 0;
+    for (let i = 0; i < grid.length; i++) {
+      if (grid[i] === BRICK_SOLID) standingCount++;
+    }
+
+    const layer = document.createElement('canvas');
+    layer.width = canvas.width;
+    layer.height = canvas.height;
+    const layerCtx = layer.getContext('2d');
+    layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const phase = forcePlay ? 'playing' : (state?.phase === 'playing' ? 'playing' : 'attract');
+
+    state = {
+      width: w,
+      height: h,
+      cell: cellSize,
+      cols,
+      rows,
+      grid,
+      standing: standingCount,
+      ox: (w - cols * cellSize) / 2,
+      oy: (h - rows * cellSize) / 2,
+      gap: Math.max(1, Math.round(cellSize * 0.22)),
+      accent: '#38bdf8',
+      layer,
+      layerCtx,
+      layerDirty: true,
+      radius: clampVal(cellSize * 0.5, 4, 9),
+      paddle: {
+        x: w / 2,
+        w: clampVal(w * 0.24, 64, 180),
+        h: clampVal(cellSize * 0.8, 6, 12),
+        y: h - Math.max(26, cellSize * 2.4)
+      },
+      ball: { x: w / 2, y: 0, vx: 0, vy: 0 },
+      baseSpeed: clampVal(h * 0.48, 180, 440) * speedMultiplier,
+      serving: true,
+      serveDelay: 0.6,
+      lives: startingLives,
+      phase,
+      clock: 0,
+      regrow: [],
+      last: 0,
+      acc: 0
+    };
+
+    updateUI();
+    renderLayer();
+    renderFrame();
+  }
+
+  function checkBrickCollisions() {
+    const { ball, radius, cell, cols, rows, ox, oy, grid } = state;
+    const cMin = Math.floor((ball.x - radius - ox) / cell);
+    const cMax = Math.floor((ball.x + radius - ox) / cell);
+    const rMin = Math.floor((ball.y - radius - oy) / cell);
+    const rMax = Math.floor((ball.y + radius - oy) / cell);
+    const hit = [];
+
+    for (let r = Math.max(0, rMin); r <= Math.min(rows - 1, rMax); r++) {
+      for (let c = Math.max(0, cMin); c <= Math.min(cols - 1, cMax); c++) {
+        const idx = r * cols + c;
+        if (grid[idx] === BRICK_SOLID) hit.push(idx);
+      }
+    }
+    return hit;
+  }
+
+  function resolveAxis(axis, dt) {
+    const { ball } = state;
+    if (axis === 'x') {
+      ball.x += ball.vx * dt;
+    } else {
+      ball.y += ball.vy * dt;
+    }
+
+    const hits = checkBrickCollisions();
+    if (!hits.length) return;
+
+    const isAttract = state.phase === 'attract';
+    hits.forEach((idx) => {
+      state.grid[idx] = BRICK_BROKEN;
+      state.standing--;
+      if (isAttract) {
+        state.regrow.push({ cell: idx, at: state.clock + REGROW_DELAY });
+      }
+    });
+
+    state.layerDirty = true;
+    if (axis === 'x') {
+      ball.x -= ball.vx * dt;
+      ball.vx = -ball.vx;
+    } else {
+      ball.y -= ball.vy * dt;
+      ball.vy = -ball.vy;
+    }
+  }
+
+  function resetServe() {
+    state.serving = true;
+    state.serveDelay = 0.8;
+    state.ball.vx = 0;
+    state.ball.vy = 0;
+  }
+
+  function setPhase(p) {
+    if (!state) return;
+    state.phase = p;
+    updateUI();
+  }
+
+  function stepPhysics(dt) {
+    const { ball, paddle, radius } = state;
+    const isAttract = state.phase === 'attract';
+
+    state.clock += dt;
+    while (state.regrow.length && state.regrow[0].at <= state.clock) {
+      const item = state.regrow.shift();
+      if (state.grid[item.cell] === BRICK_BROKEN) {
+        state.grid[item.cell] = BRICK_SOLID;
+        state.standing++;
+        state.layerDirty = true;
+      }
+    }
+
+    if (isAttract && !state.serving) {
+      paddle.x = clampVal(
+        paddle.x + (ball.x - paddle.x) * Math.min(1, dt * 7),
+        paddle.w / 2,
+        state.width - paddle.w / 2
+      );
+    }
+
+    if (state.serving) {
+      ball.x = paddle.x;
+      ball.y = paddle.y - radius - 1;
+      if (Number.isFinite(state.serveDelay)) {
+        state.serveDelay -= dt;
+        if (state.serveDelay <= 0) {
+          state.serving = false;
+          ball.vx = state.baseSpeed * 0.35 * (Math.random() < 0.5 ? -1 : 1);
+          ball.vy = -state.baseSpeed;
+        }
+      }
+      return;
+    }
+
+    resolveAxis('x', dt);
+    resolveAxis('y', dt);
+
+    if (ball.x - radius < 0) {
+      ball.x = radius;
+      ball.vx = Math.abs(ball.vx);
+    }
+    if (ball.x + radius > state.width) {
+      ball.x = state.width - radius;
+      ball.vx = -Math.abs(ball.vx);
+    }
+    if (ball.y - radius < 0) {
+      ball.y = radius;
+      ball.vy = Math.abs(ball.vy);
+    }
+
+    const inPaddleX = Math.abs(ball.x - paddle.x) <= paddle.w / 2 + radius;
+    const inPaddleY = ball.vy > 0 && ball.y + radius >= paddle.y && ball.y - radius <= paddle.y + paddle.h;
+
+    if (inPaddleX && inPaddleY) {
+      const offset = clampVal((ball.x - paddle.x) / (paddle.w / 2), -1, 1) * 1.05;
+      const curSpeed = Math.min(Math.hypot(ball.vx, ball.vy) * 1.01, state.baseSpeed * 1.45);
+      ball.vx = Math.sin(offset) * curSpeed;
+      ball.vy = -Math.cos(offset) * curSpeed;
+      ball.y = paddle.y - radius - 0.5;
+    }
+
+    if (ball.y - radius > state.height) {
+      if (isAttract) {
+        resetServe();
+      } else {
+        state.lives--;
+        updateUI();
+        if (state.lives <= 0) {
+          setPhase('over');
+        } else {
+          resetServe();
+        }
+      }
+    }
+
+    if (!isAttract && state.standing === 0) {
+      setPhase('won');
+    }
+  }
+
+  const SUBSTEP = 1 / 120;
+  function gameLoop(now) {
+    animId = requestAnimationFrame(gameLoop);
+    if (!state || (!isPanelVisible && !isDocVisible)) return;
+
+    const delta = state.last ? Math.min((now - state.last) / 1000, 4 * SUBSTEP) : 0;
+    state.last = now;
+
+    if (state.phase === 'playing' || state.phase === 'attract') {
+      state.acc += delta;
+      let iters = 0;
+      while (state.acc >= SUBSTEP && iters < 4) {
+        stepPhysics(SUBSTEP);
+        state.acc -= SUBSTEP;
+        iters++;
+      }
+      if (iters === 4) state.acc = 0;
+    }
+
+    renderFrame();
+  }
+
+  function launchGame() {
+    if (!state) return;
+    if (state.phase !== 'playing') {
+      resetBoard(true);
+    }
+    state.phase = 'playing';
+    if (state.serving) {
+      state.ball.x = state.paddle.x;
+      state.ball.y = state.paddle.y - state.radius - 1;
+      state.serving = false;
+      state.serveDelay = Infinity;
+      state.ball.vx = state.baseSpeed * 0.35 * (Math.random() < 0.5 ? -1 : 1);
+      state.ball.vy = -state.baseSpeed;
+    }
+    updateUI();
+  }
+
+  function movePaddleTo(x) {
+    if (!state) return;
+    state.paddle.x = clampVal(x, state.paddle.w / 2, state.width - state.paddle.w / 2);
+  }
+
+  panel.addEventListener('pointermove', (e) => {
+    const rect = panel.getBoundingClientRect();
+    if (state?.phase === 'attract') {
+      launchGame();
+    }
+    movePaddleTo(e.clientX - rect.left);
+  }, { passive: true });
+
+  panel.addEventListener('pointerdown', (e) => {
+    if (!e.target.closest('#breakoutActionBtn')) {
+      launchGame();
+    }
+  });
+
+  actionBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    launchGame();
+  });
+
+  panel.addEventListener('keydown', (e) => {
+    const step = (state?.cell ?? 8) * 4;
+    if (e.key === 'ArrowLeft') {
+      if (state?.phase === 'attract') launchGame();
+      if (state) state.paddle.x = clampVal(state.paddle.x - step, state.paddle.w / 2, state.width - state.paddle.w / 2);
+      e.preventDefault();
+    } else if (e.key === 'ArrowRight') {
+      if (state?.phase === 'attract') launchGame();
+      if (state) state.paddle.x = clampVal(state.paddle.x + step, state.paddle.w / 2, state.width - state.paddle.w / 2);
+      e.preventDefault();
+    } else if (e.key === ' ' || e.key === 'Enter') {
+      launchGame();
+      e.preventDefault();
+    }
+  });
+
+  const resizeObserver = new ResizeObserver(() => {
+    resetBoard();
+  });
+  resizeObserver.observe(panel);
+
+  const intersectionObserver = new IntersectionObserver(([entry]) => {
+    isPanelVisible = entry.isIntersecting;
+  }, { threshold: 0.05 });
+  intersectionObserver.observe(panel);
+
+  document.addEventListener('visibilitychange', () => {
+    isDocVisible = document.visibilityState === 'visible';
+  });
+
+  resetBoard();
+  animId = requestAnimationFrame(gameLoop);
 }
 
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {

@@ -479,6 +479,52 @@
     </div>
   </section>
 
+  <!-- Breakout Game Section: Playable "HELLO WORLD" (Hasibul Hasan Style) -->
+  <section class="play-section" id="play">
+    <div class="play-container">
+      <div class="play-header">
+        <p class="play-caption">Break it if you can. It still ships.</p>
+      </div>
+
+      <!-- Play Panel Wrapper -->
+      <div class="breakout-panel" id="breakoutPanel" tabindex="0" role="application" aria-label="HELLO WORLD — a playable headline. Move cursor or arrow keys to control the paddle.">
+        <canvas id="breakoutCanvas" class="breakout-canvas"></canvas>
+
+        <!-- Lives Counter (Top Right) -->
+        <div class="breakout-lives" id="breakoutLives" aria-hidden="true">
+          <span class="life-dot alive"></span>
+          <span class="life-dot alive"></span>
+          <span class="life-dot alive"></span>
+        </div>
+
+        <!-- Game Status / Action Overlay (Bottom Right) -->
+        <div class="breakout-action-bar" id="breakoutActionBar">
+          <span class="breakout-status-text" id="breakoutStatus">OUT OF BALLS</span>
+          <button type="button" class="breakout-btn" id="breakoutActionBtn">Play</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clean Developer Footer (Matching Reference) -->
+  <footer class="portfolio-footer">
+    <div class="footer-container">
+      <div class="footer-inner">
+        <p class="footer-copyright">© 2026 Abhishek. All rights reserved.</p>
+        <nav class="footer-nav" aria-label="Footer Navigation">
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#skills">Skills</a>
+          <a href="#project">Projects</a>
+          <a href="#contact">Contact</a>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <a href="#privacy">Privacy policy</a>
+          <a href="#terms">Terms</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
