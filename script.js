@@ -321,7 +321,10 @@ function morphText(fromText, toText, duration, onComplete) {
 }
 
 // =========================================
-// ENTRY ANIMATION TIMELINE: FALLING "i" + CROSS-SCREEN FLIGHT OF "ABH" & "SHEK"
+// ENTRY ANIMATION TIMELINE:
+// 1. "i" falls first, bounces & settles ALONE
+// 2. "ABH" glides in SLOW MOTION from left screen edge
+// 3. "SHEK" glides in SLOW MOTION from right screen edge
 // =========================================
 function runEntrySequence() {
   // Step 1: The DOT falls from the top with gravity, bounces on the floor, and casts shadow (150ms)
@@ -335,30 +338,36 @@ function runEntrySequence() {
     iBar.classList.add('drop-bounce');
   }, 450);
 
-  // Step 3: "ABH" flies in from the left screen, "SHEK" flies in from the right screen (1350ms)
+  // Step 3: Only after "i" has completely settled, "ABH" glides in slow motion from left screen edge (1400ms)
   setTimeout(() => {
-    prefixText.classList.add('attached');
-    suffixText.classList.add('attached');
-  }, 1350);
+    prefixText.textContent = 'ABH';
+    prefixText.classList.add('flying-left');
+  }, 1400);
 
-  // Step 4: As letters dock onto "i", trigger landing impulse and fuse into solid uppercase "I" (2100ms)
+  // Step 4: Then "SHEK" glides in slow motion from right screen edge (2700ms)
+  setTimeout(() => {
+    suffixText.textContent = 'SHEK';
+    suffixText.classList.add('flying-right');
+  }, 2700);
+
+  // Step 5: As both letters dock, trigger impact ripple and fuse into solid uppercase "I" (4000ms)
   setTimeout(() => {
     iLetterWrap.classList.add('dock-impact');
     iLetterWrap.classList.add('fused');
     setTimeout(() => {
       iLetterWrap.classList.remove('dock-impact');
     }, 300);
-  }, 2100);
+  }, 4000);
 
-  // Step 5: Morph "ABHISHEK" -> "PORTFOLIO" (2850ms)
+  // Step 6: Morph "ABHISHEK" -> "PORTFOLIO" (4750ms)
   setTimeout(() => {
     giantTitle.innerHTML = 'ABHISHEK';
     morphText('ABHISHEK', 'PORTFOLIO', 750, () => {
-      // Step 6: "PORTFOLIO" glides smoothly down to bottom position (3700ms)
+      // Step 7: "PORTFOLIO" glides smoothly down to bottom position (5600ms)
       setTimeout(() => {
         heroCenter.classList.add('in-position');
 
-        // Step 7: Reveal navbar, footer, and trigger cosmic particle assembly (4150ms)
+        // Step 8: Reveal navbar, footer, and trigger cosmic particle assembly (6050ms)
         setTimeout(() => {
           mainNavbar.classList.remove('intro-hidden');
           mainNavbar.classList.add('intro-visible');
@@ -377,7 +386,7 @@ function runEntrySequence() {
         }, 450);
       }, 150);
     });
-  }, 2850);
+  }, 4750);
 }
 
 // Handle both fresh load and cached load reliably

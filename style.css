@@ -339,31 +339,40 @@ html, body {
 }
 
 /* =========================================
-   ATTACHING LETTERS: "ABH" (FROM LEFT SCREEN) & "SHEK" (FROM RIGHT SCREEN)
+   SEQUENTIAL SLOW-MOTION FLIGHT:
+   ABH (FROM LEFT) THEN SHEK (FROM RIGHT)
    ========================================= */
 .anim-letter-group {
   display: inline-block;
   opacity: 0;
+  visibility: hidden;
   will-change: transform, opacity;
   filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.9));
 }
 
-/* Start completely off-screen on the far left and right edges */
+/* Off-screen starting positions */
 .anim-letter-group.slide-left {
-  transform: translateX(-65vw);
-  opacity: 0;
+  transform: translateX(-100vw);
 }
 
 .anim-letter-group.slide-right {
-  transform: translateX(65vw);
-  opacity: 0;
+  transform: translateX(100vw);
 }
 
-/* Fly smoothly across the screen and dock onto the "i" */
-.anim-letter-group.attached {
-  transform: translateX(0) !important;
+/* Slow-motion flight from far left */
+.anim-letter-group.flying-left {
+  visibility: visible !important;
   opacity: 1 !important;
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  transform: translateX(0) !important;
+  transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+/* Slow-motion flight from far right */
+.anim-letter-group.flying-right {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+  transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
 }
 
 /* =========================================
