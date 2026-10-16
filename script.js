@@ -399,9 +399,6 @@ function runEntrySequence() {
                     heroFooter.classList.remove('intro-hidden');
                     heroFooter.classList.add('intro-visible');
 
-                    interactionHint.classList.remove('intro-hidden');
-                    interactionHint.classList.add('intro-visible');
-
                     introComplete = true;
 
                     // Thousands of pixels rush in from outer space to assemble Abhishek's portrait!
