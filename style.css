@@ -1107,17 +1107,6 @@ body.intro-finished {
   text-transform: uppercase;
 }
 
-.books-nav-counter {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.28);
-  padding: 4px 12px;
-  border-radius: 999px;
-}
-
 /* Carousel Buttons */
 .book-carousel-btn {
   position: absolute;

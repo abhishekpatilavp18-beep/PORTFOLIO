@@ -940,7 +940,6 @@ function initBooksShowcase() {
   const detailPanel = document.getElementById('bookDetailPanel');
   const prevBtn = document.getElementById('bookPrevBtn');
   const nextBtn = document.getElementById('bookNextBtn');
-  const counterEl = document.getElementById('booksCounter');
 
   if (!root || !canvasEl) return;
 
