@@ -2506,6 +2506,8 @@ function initBreakoutGame() {
     ctx.fill();
   }
 
+  const actionBar = document.getElementById('breakoutActionBar');
+
   function updateUI() {
     if (!state) return;
     const isPlaying = state.phase === 'playing';
@@ -2513,9 +2515,11 @@ function initBreakoutGame() {
     if (isPlaying) {
       panel.classList.add('is-playing');
       livesContainer.classList.add('active');
+      if (actionBar) actionBar.classList.add('hidden');
     } else {
       panel.classList.remove('is-playing');
       livesContainer.classList.remove('active');
+      if (actionBar) actionBar.classList.remove('hidden');
     }
 
     if (livesContainer) {
@@ -2533,9 +2537,6 @@ function initBreakoutGame() {
       statusText.textContent = 'CLEARED';
       statusText.className = 'breakout-status-text show won';
       actionBtn.textContent = 'AGAIN';
-    } else if (state.phase === 'playing') {
-      statusText.className = 'breakout-status-text';
-      actionBtn.textContent = 'PLAY';
     } else {
       statusText.className = 'breakout-status-text';
       actionBtn.textContent = 'PLAY';
@@ -2595,7 +2596,7 @@ function initBreakoutGame() {
         x: w / 2,
         w: clampVal(w * 0.24, 64, 180),
         h: clampVal(cellSize * 0.8, 6, 12),
-        y: h - Math.max(26, cellSize * 2.4)
+        y: h - Math.max(68, cellSize * 4.2)
       },
       ball: { x: w / 2, y: 0, vx: 0, vy: 0 },
       baseSpeed: clampVal(h * 0.48, 180, 440) * speedMultiplier,

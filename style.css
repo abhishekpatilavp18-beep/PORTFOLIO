@@ -1818,12 +1818,19 @@ body.intro-finished {
 /* Action Overlay (Bottom Right) */
 .breakout-action-bar {
   position: absolute;
-  bottom: 20px;
-  right: 22px;
+  bottom: 16px;
+  right: 20px;
   display: flex;
   align-items: center;
   gap: 16px;
   z-index: 10;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.breakout-action-bar.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
 }
 
 .breakout-status-text {
