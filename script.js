@@ -281,8 +281,37 @@ function animate() {
 }
 
 // =========================================
-// TEXT MORPHING / SCRAMBLE UTILITY
+// SCRAMBLE / MORPH REVEAL UTILITY
 // =========================================
+function scrambleReveal(element, targetWord, duration, onComplete) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const startTime = performance.now();
+
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(1, elapsed / duration);
+    const settledCount = Math.floor(progress * targetWord.length);
+
+    let output = '';
+    for (let i = 0; i < targetWord.length; i++) {
+      if (i < settledCount) {
+        output += targetWord[i];
+      } else {
+        output += chars[Math.floor(Math.random() * chars.length)];
+      }
+    }
+    element.textContent = output;
+
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      element.textContent = targetWord;
+      if (onComplete) onComplete();
+    }
+  }
+  requestAnimationFrame(step);
+}
+
 function morphText(fromText, toText, duration, onComplete) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const maxLen = Math.max(fromText.length, toText.length);
@@ -291,7 +320,6 @@ function morphText(fromText, toText, duration, onComplete) {
   function updateScramble(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(1, elapsed / duration);
-
     const settledCount = Math.floor(progress * toText.length);
 
     let result = '';
@@ -322,9 +350,10 @@ function morphText(fromText, toText, duration, onComplete) {
 
 // =========================================
 // ENTRY ANIMATION TIMELINE:
-// 1. "i" falls first, bounces & settles ALONE
-// 2. "ABH" glides in SLOW MOTION from left screen edge
-// 3. "SHEK" glides in SLOW MOTION from right screen edge
+// 1. "i" falls first, bounces & stays FIXED
+// 2. "ABH" scramble-animates on the left of "i"
+// 3. "SHEK" scramble-animates on the right of "i"
+// 4. "ABHISHEK" scramble-morphs into "PORTFOLIO"
 // =========================================
 function runEntrySequence() {
   // Step 1: The DOT falls from the top with gravity, bounces on the floor, and casts shadow (150ms)
@@ -338,55 +367,54 @@ function runEntrySequence() {
     iBar.classList.add('drop-bounce');
   }, 450);
 
-  // Step 3: Only after "i" has completely settled, "ABH" glides in slow motion from left screen edge (1400ms)
+  // Step 3: "i" is now completely settled & FIXED in center.
+  // "ABH" on the left scramble-morphs into place (1300ms)
   setTimeout(() => {
-    prefixText.textContent = 'ABH';
-    prefixText.classList.add('flying-left');
-  }, 1400);
-
-  // Step 4: Then "SHEK" glides in slow motion from right screen edge (2700ms)
-  setTimeout(() => {
-    suffixText.textContent = 'SHEK';
-    suffixText.classList.add('flying-right');
-  }, 2700);
-
-  // Step 5: As both letters dock, trigger impact ripple and fuse into solid uppercase "I" (4000ms)
-  setTimeout(() => {
-    iLetterWrap.classList.add('dock-impact');
-    iLetterWrap.classList.add('fused');
-    setTimeout(() => {
-      iLetterWrap.classList.remove('dock-impact');
-    }, 300);
-  }, 4000);
-
-  // Step 6: Morph "ABHISHEK" -> "PORTFOLIO" (4750ms)
-  setTimeout(() => {
-    giantTitle.innerHTML = 'ABHISHEK';
-    morphText('ABHISHEK', 'PORTFOLIO', 750, () => {
-      // Step 7: "PORTFOLIO" glides smoothly down to bottom position (5600ms)
+    scrambleReveal(prefixText, 'ABH', 650, () => {
+      // Step 4: "SHEK" on the right scramble-morphs into place (1950ms)
       setTimeout(() => {
-        heroCenter.classList.add('in-position');
+        scrambleReveal(suffixText, 'SHEK', 700, () => {
+          // Step 5: Both sides have assembled! Fuse "i" cleanly into uppercase "I" (2800ms)
+          setTimeout(() => {
+            iLetterWrap.classList.add('dock-impact');
+            iLetterWrap.classList.add('fused');
+            setTimeout(() => {
+              iLetterWrap.classList.remove('dock-impact');
+            }, 250);
 
-        // Step 8: Reveal navbar, footer, and trigger cosmic particle assembly (6050ms)
-        setTimeout(() => {
-          mainNavbar.classList.remove('intro-hidden');
-          mainNavbar.classList.add('intro-visible');
+            // Step 6: Morph "ABHISHEK" -> "PORTFOLIO" (3400ms)
+            setTimeout(() => {
+              giantTitle.innerHTML = 'ABHISHEK';
+              morphText('ABHISHEK', 'PORTFOLIO', 750, () => {
+                // Step 7: "PORTFOLIO" glides smoothly down to bottom position (4250ms)
+                setTimeout(() => {
+                  heroCenter.classList.add('in-position');
 
-          heroFooter.classList.remove('intro-hidden');
-          heroFooter.classList.add('intro-visible');
+                  // Step 8: Reveal navbar, footer, and trigger cosmic particle assembly (4700ms)
+                  setTimeout(() => {
+                    mainNavbar.classList.remove('intro-hidden');
+                    mainNavbar.classList.add('intro-visible');
 
-          interactionHint.classList.remove('intro-hidden');
-          interactionHint.classList.add('intro-visible');
+                    heroFooter.classList.remove('intro-hidden');
+                    heroFooter.classList.add('intro-visible');
 
-          introComplete = true;
+                    interactionHint.classList.remove('intro-hidden');
+                    interactionHint.classList.add('intro-visible');
 
-          // Thousands of pixels rush in from outer space to assemble Abhishek's portrait!
-          startParticleAssembly = true;
-          createParticles(true);
-        }, 450);
-      }, 150);
+                    introComplete = true;
+
+                    // Thousands of pixels rush in from outer space to assemble Abhishek's portrait!
+                    startParticleAssembly = true;
+                    createParticles(true);
+                  }, 450);
+                }, 150);
+              });
+            }, 600);
+          }, 150);
+        });
+      }, 100);
     });
-  }, 4750);
+  }, 1300);
 }
 
 // Handle both fresh load and cached load reliably

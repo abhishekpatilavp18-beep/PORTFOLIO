@@ -191,6 +191,15 @@ html, body {
   filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.9));
 }
 
+/* Scramble letter slots */
+.anim-letter-slot {
+  display: inline-block;
+  min-width: 0;
+  letter-spacing: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+}
+
 /* =========================================
    PHYSICS INTRO: FALLING "i" WITH BOUNCE & SHADOWS
    ========================================= */
@@ -208,7 +217,7 @@ html, body {
 }
 
 .i-letter-wrap.dock-impact {
-  transform: scale(1.12);
+  transform: scale(1.1);
 }
 
 /* Floor Shadow below the landing point */
@@ -323,56 +332,20 @@ html, body {
 /* When fused into uppercase I */
 .i-letter-wrap.fused {
   gap: 0;
-  transition: gap 0.3s ease;
+  margin: 0;
+  transition: gap 0.25s ease, margin 0.25s ease;
 }
 
 .i-letter-wrap.fused .i-dot {
   opacity: 0;
   transform: scale(0);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .i-letter-wrap.fused .i-bar {
   height: clamp(65px, 8.5vw, 110px);
   border-radius: 4px;
-  transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* =========================================
-   SEQUENTIAL SLOW-MOTION FLIGHT:
-   ABH (FROM LEFT) THEN SHEK (FROM RIGHT)
-   ========================================= */
-.anim-letter-group {
-  display: inline-block;
-  opacity: 0;
-  visibility: hidden;
-  will-change: transform, opacity;
-  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.9));
-}
-
-/* Off-screen starting positions */
-.anim-letter-group.slide-left {
-  transform: translateX(-100vw);
-}
-
-.anim-letter-group.slide-right {
-  transform: translateX(100vw);
-}
-
-/* Slow-motion flight from far left */
-.anim-letter-group.flying-left {
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateX(0) !important;
-  transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-}
-
-/* Slow-motion flight from far right */
-.anim-letter-group.flying-right {
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateX(0) !important;
-  transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* =========================================
