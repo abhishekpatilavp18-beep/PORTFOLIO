@@ -11,12 +11,12 @@
 </head>
 <body>
 
-  <!-- Navigation (Hidden initially, slides in during intro) -->
+  <!-- Navigation (Slides in during intro, fixed at top) -->
   <header class="navbar intro-hidden" id="mainNavbar">
     <a href="#home" class="logo">ABHISHEK</a>
     <nav class="nav-links">
-      <a href="#home" class="nav-link active">HOME</a>
-      <a href="#about" class="nav-link">ABOUT</a>
+      <a href="#home" class="nav-link active" id="navHome">HOME</a>
+      <a href="#about" class="nav-link" id="navAbout">ABOUT</a>
       <a href="#service" class="nav-link">SERVICE</a>
       <a href="#project" class="nav-link">PROJECT</a>
       <a href="#components" class="nav-link">COMPONENTS</a>
@@ -34,13 +34,13 @@
       <!-- Animated Title (Starts Center Screen for Intro, Slides to Bottom) -->
       <div class="hero-center intro-center" id="heroCenter">
         <h1 class="giant-portfolio-text" id="giantTitle">
-          <span class="anim-letter-group slide-left" id="prefixText"></span>
+          <span class="anim-letter-slot" id="prefixText"></span>
           <span class="i-letter-wrap" id="iLetterWrap">
             <span class="i-bar" id="iBar"></span>
             <span class="i-dot" id="iDot"></span>
             <span class="i-floor-shadow" id="iFloorShadow"></span>
           </span>
-          <span class="anim-letter-group slide-right" id="suffixText"></span>
+          <span class="anim-letter-slot" id="suffixText"></span>
         </h1>
       </div>
 
@@ -53,6 +53,26 @@
       </div>
     </div>
   </main>
+
+  <!-- About Section ("Intro") Matching Hasibul Hasan Reference -->
+  <section class="about-section" id="about">
+    <div class="about-container">
+      <!-- Left Column: Intro Heading -->
+      <div class="about-left">
+        <span class="section-badge">ABOUT ME</span>
+        <h2 class="section-title">Intro</h2>
+      </div>
+
+      <!-- Right Column: Bio Card -->
+      <div class="about-right">
+        <div class="bio-card">
+          <p class="bio-text">
+            Hey, I’m a <span class="highlight">passionate Computer Science student</span> who loves building <span class="highlight">modern, user-friendly websites and applications</span>. I enjoy learning <span class="highlight">new technologies</span>, <span class="highlight">solving problems</span>, and turning creative ideas into <span class="highlight">real-world projects</span>. I’m constantly improving my skills in <span class="highlight">web development and programming</span>, with a goal of building <span class="highlight">impactful digital experiences</span> through clean code and creative design.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <script src="script.js"></script>
 </body>

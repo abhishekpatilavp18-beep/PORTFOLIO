@@ -421,6 +421,33 @@ function initApp() {
   initAmbientParticles();
   animate();
   runEntrySequence();
+  initNavObserver();
+}
+
+// Update active navbar link on scroll
+function initNavObserver() {
+  const sections = document.querySelectorAll('main[id], section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    const scrollPos = window.pageYOffset + 250;
+
+    sections.forEach((section) => {
+      const top = section.offsetTop;
+      const height = section.offsetHeight;
+      if (scrollPos >= top && scrollPos < top + height) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach((link) => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === `#${current}`) {
+        link.classList.add('active');
+      }
+    });
+  }, { passive: true });
 }
 
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {
