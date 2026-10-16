@@ -479,7 +479,8 @@ function initAsciiGlitchRipple() {
   const ANIM_STEP = 80;
   const WAVE_BUF = 4;
   const dur = 2400; // Calm and smooth ripple pace
-  const chars = '.,·-─~+:;=*π""┐┌┘┴┬╗╔╝╚╬╠╣╩╦║░▒▓█▄▀▌▐■!?&#$@0123456789*';
+  // Proportional-safe cyber characters (avoids double-width Unicode blocks that push layout)
+  const chars = '.,·-~+:;=*!?&#$@0123456789|/\\<>[]{}^%_';
   const preserveSpaces = true;
   const spread = 1.8;
 
@@ -495,6 +496,10 @@ function initAsciiGlitchRipple() {
   const originalHtml = container.innerHTML;
 
   function buildVisualLines() {
+    // Reset container style for true measurement
+    container.style.height = '';
+    container.style.minHeight = '';
+
     // 1. Break into word and whitespace tokens, tracking highlight status
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = originalHtml;
@@ -576,6 +581,13 @@ function initAsciiGlitchRipple() {
       container.appendChild(lineDiv);
       setupLineRipple(lineDiv);
     });
+
+    // 5. Freeze container height to prevent any layout shift during animation
+    const measuredHeight = container.getBoundingClientRect().height;
+    if (measuredHeight > 0) {
+      container.style.height = `${Math.ceil(measuredHeight)}px`;
+      container.style.minHeight = `${Math.ceil(measuredHeight)}px`;
+    }
   }
 
   function setupLineRipple(el) {

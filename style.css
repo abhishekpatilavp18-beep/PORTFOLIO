@@ -433,7 +433,7 @@ body.intro-finished {
   display: grid;
   grid-template-columns: 1fr 1.35fr;
   gap: clamp(40px, 6vw, 95px);
-  align-items: center;
+  align-items: start;
   width: 100%;
   max-width: 1360px;
 }
@@ -442,6 +442,7 @@ body.intro-finished {
 .about-left {
   display: flex;
   flex-direction: column;
+  padding-top: 6px;
 }
 
 .section-badge {
@@ -478,6 +479,7 @@ body.intro-finished {
 .about-right {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .bio-card {
@@ -491,6 +493,8 @@ body.intro-finished {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  contain: layout;
 }
 
 .bio-card:hover {
@@ -506,10 +510,16 @@ body.intro-finished {
   user-select: none;
   font-variant-numeric: tabular-nums;
   position: relative;
+  overflow: hidden;
 }
 
 .bio-line {
-  margin: 0 0 4px 0;
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  margin: 0 0 6px 0;
   line-height: 1.85;
   transition: color 0.3s ease;
   position: relative;
