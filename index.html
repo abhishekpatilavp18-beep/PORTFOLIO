@@ -11,6 +11,8 @@
   <!-- GSAP & ScrollTrigger for Staggered Grid Scroll Animation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Three.js for 3D Interactive Books Showcase -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
@@ -262,6 +264,99 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section: 3D Books Showcase (Vengeance UI Inspired) -->
+  <section class="projects-section" id="project">
+    <div class="projects-header">
+      <h2 class="projects-title">FEATURED PROJECTS</h2>
+      <p class="projects-subtitle">Interactive 3D publication showcase — click any book to read architecture, tech stack & launch live demo</p>
+    </div>
+
+    <!-- 3D Books Showcase Stage -->
+    <div class="books-showcase-wrapper" id="booksShowcase" tabindex="0">
+      <!-- Huge background watermark word -->
+      <div class="book-hero-word" id="bookHeroWord">
+        <span>PROJECTS</span>
+      </div>
+
+      <!-- WebGL Canvas for 3D Books -->
+      <canvas id="booksCanvas"></canvas>
+
+      <!-- Showcase Header Bar -->
+      <div class="books-nav-bar">
+        <span class="books-nav-title">Works & Experiments</span>
+        <span class="books-nav-counter" id="booksCounter">4 PROJECTS</span>
+      </div>
+
+      <!-- Navigation Arrows -->
+      <button class="book-carousel-btn book-prev-btn" id="bookPrevBtn" aria-label="Previous project book">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+      <button class="book-carousel-btn book-next-btn" id="bookNextBtn" aria-label="Next project book">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </button>
+
+      <!-- Cursor Follower "OPEN" slip -->
+      <div class="book-open-slip" id="openSlip">OPEN</div>
+
+      <!-- Close Detail View Button (✕) -->
+      <button class="book-detail-close" id="bookDetailClose" aria-label="Close project view">✕</button>
+
+      <!-- Side Detail Panel (Animated in on book select) -->
+      <div class="book-detail-panel" id="bookDetailPanel">
+        <div class="detail-badge-pill" id="detailCategory">WEB APPLICATION</div>
+        <h3 class="detail-project-title" id="detailTitle">Screen Tester</h3>
+        <p class="detail-project-desc" id="detailDesc">
+          A web-based tool that allows users to test their screen for display issues, including dead pixels, color accuracy, brightness, and contrast directly in the browser.
+        </p>
+
+        <!-- Tech Stack Badges Row -->
+        <div class="detail-tech-chips" id="detailTech">
+          <span class="tech-chip">HTML</span>
+          <span class="tech-chip">CSS</span>
+          <span class="tech-chip">JavaScript</span>
+        </div>
+
+        <!-- Rating & Details Bar -->
+        <div class="detail-meta-bar">
+          <div class="detail-stars-wrap">
+            <span class="star-filled">★</span>
+            <span class="star-filled">★</span>
+            <span class="star-filled">★</span>
+            <span class="star-filled">★</span>
+            <span class="star-filled">★</span>
+          </div>
+          <div class="detail-meta-sep"></div>
+          <div class="detail-meta-status" id="detailStatus">Production Ready</div>
+          <div class="detail-meta-year" id="detailYear">2024</div>
+        </div>
+
+        <div class="detail-divider-line"></div>
+
+        <!-- Action Links -->
+        <div class="detail-actions-row">
+          <a href="https://screen-tester.com" target="_blank" rel="noopener noreferrer" class="btn-detail-action btn-detail-primary" id="detailLiveBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            <span id="detailLiveText">Live Demo</span>
+          </a>
+          <a href="https://github.com/abhishekpatilavp18-beep" target="_blank" rel="noopener noreferrer" class="btn-detail-action btn-detail-secondary" id="detailRepoBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            <span id="detailRepoText">GitHub</span>
+          </a>
+        </div>
       </div>
     </div>
   </section>

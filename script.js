@@ -437,6 +437,7 @@ function initApp() {
   initNavObserver();
   initAsciiGlitchRipple();
   initSolarSystem();
+  initBooksShowcase();
 }
 
 // Update active navbar link on scroll
@@ -919,6 +920,1016 @@ function initSolarSystem() {
 
   viewport.addEventListener('pointerup', endDrag);
   viewport.addEventListener('pointercancel', endDrag);
+}
+
+/* =========================================
+   PROJECTS: 3D BOOKS SHOWCASE (VENGEANCE UI)
+   Three.js 3D Interactive Publication Showcase
+   ========================================= */
+
+function initBooksShowcase() {
+  if (typeof THREE === 'undefined') {
+    console.warn('Three.js not loaded for Books Showcase');
+    return;
+  }
+
+  const root = document.getElementById('booksShowcase');
+  const canvasEl = document.getElementById('booksCanvas');
+  const openSlip = document.getElementById('openSlip');
+  const closeBtn = document.getElementById('bookDetailClose');
+  const detailPanel = document.getElementById('bookDetailPanel');
+  const prevBtn = document.getElementById('bookPrevBtn');
+  const nextBtn = document.getElementById('bookNextBtn');
+  const counterEl = document.getElementById('booksCounter');
+
+  if (!root || !canvasEl) return;
+
+  // Project publication metadata
+  const PROJECTS = [
+    {
+      id: 'screen-tester',
+      category: 'UTILITY · MONITOR DIAGNOSTIC',
+      title: 'Screen Tester',
+      tagline: 'Online Screen & Monitor Test',
+      author: 'Abhishek · Full Stack',
+      year: '2024',
+      stars: 5,
+      status: 'Live Production',
+      desc: 'A web-based tool that allows users to test their screen for display issues, including dead pixels, color accuracy, refresh rate, brightness, contrast, and ghosting directly in the browser.',
+      tech: ['HTML', 'CSS', 'JavaScript'],
+      liveUrl: 'https://screen-tester.com',
+      repoUrl: 'https://github.com/abhishekpatilavp18-beep',
+      image: 'assets/projects/screen-tester.png',
+      spineBg: '#0f172a',
+      spineInk: '#38bdf8',
+      accentColor: '#38bdf8',
+      chapters: ['Display Resolution & DPI', 'Dead Pixel Matrix Test', 'Color Uniformity Check', 'Refresh Rate 60/120Hz', 'OLED Ghosting Analysis']
+    },
+    {
+      id: 'keyboard-tester',
+      category: 'HARDWARE · INPUT DIAGNOSTIC',
+      title: 'Keyboard Tester',
+      tagline: 'KeyCheck Interactive Diagnostic',
+      author: 'Abhishek · Full Stack',
+      year: '2024',
+      stars: 5,
+      status: 'Live Production',
+      desc: 'An interactive web application that helps users test their keyboard keys and verify whether they are functioning correctly in real-time with auditory mechanical thock sound feedback.',
+      tech: ['HTML', 'CSS', 'JavaScript'],
+      liveUrl: 'https://keyboardtester1.com',
+      repoUrl: 'https://github.com/abhishekpatilavp18-beep',
+      image: 'assets/projects/keyboard-tester.png',
+      spineBg: '#18181b',
+      spineInk: '#ffffff',
+      accentColor: '#ffffff',
+      chapters: ['Full Keyboard Matrix', 'Multi-Key Rollover Test', 'Mechanical Thock Sounds', 'Layout Switching', 'Latency Diagnostics']
+    },
+    {
+      id: 'lumina-scheduler',
+      category: 'PRODUCTIVITY · SCHEDULING PLATFORM',
+      title: 'Lumina Scheduler',
+      tagline: 'Kite Smart Meeting Platform',
+      author: 'Abhishek · Full Stack',
+      year: '2024',
+      stars: 5,
+      status: 'Live Production',
+      desc: 'A smart meeting scheduling platform that simplifies booking meetings by allowing users to share scheduling links and let guests choose suitable time slots with automated reminders.',
+      tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB'],
+      liveUrl: 'https://meetingscheduler1.netlify.app',
+      repoUrl: 'https://github.com/abhishekpatilavp18-beep',
+      image: 'assets/projects/lumina-scheduler.png',
+      spineBg: '#1e1b4b',
+      spineInk: '#818cf8',
+      accentColor: '#818cf8',
+      chapters: ['Dynamic Booking Slots', 'Calendar Event Automation', 'MongoDB Timeslot Store', 'Express REST Service', 'Responsive Guest Portal']
+    },
+    {
+      id: 'orca-marine',
+      category: 'AI · OCEANIC INTELLIGENCE',
+      title: 'ORCA Marine',
+      tagline: 'Marine Intelligence Platform',
+      author: 'Abhishek · AI & Systems',
+      year: 'In Development',
+      stars: 5,
+      status: 'In Development',
+      desc: 'Marine intelligence platform leveraging advanced agentic AI reasoning to synthesize complex meteorological, navigational, and operational marine data into clear, actionable insights.',
+      tech: ['Next.js', 'AI Reasoning', 'Python', 'Marine Data'],
+      liveUrl: 'https://github.com/abhishekpatilavp18-beep',
+      repoUrl: 'https://github.com/abhishekpatilavp18-beep',
+      image: 'assets/projects/orca-marine.png',
+      spineBg: '#042f2e',
+      spineInk: '#2dd4bf',
+      accentColor: '#2dd4bf',
+      chapters: ['Agentic Weather Reasoning', 'Navigational Route Engine', 'Sonar Telemetry Modeling', 'Vessel Fleet Assistant', 'Marine GIS Mapping']
+    }
+  ];
+
+  const N = PROJECTS.length;
+  const VISIBLE = Math.min(3, N);
+
+  // Springs for 3D physics
+  class Spring {
+    constructor(v, k = 120, d = 14) {
+      this.v = v;
+      this.t = v;
+      this.vel = 0;
+      this.k = k;
+      this.d = d;
+    }
+    set(v) {
+      this.v = v;
+      this.t = v;
+      this.vel = 0;
+      return this;
+    }
+    update(dt) {
+      const a = this.k * (this.t - this.v) - this.d * this.vel;
+      this.vel += a * dt;
+      this.v += this.vel * dt;
+      return this.v;
+    }
+  }
+
+  function mkCanvas(w, h) {
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    return c;
+  }
+
+  function rr(x, px, py, w, h, r) {
+    x.beginPath();
+    x.moveTo(px + r, py);
+    x.arcTo(px + w, py, px + w, py + h, r);
+    x.arcTo(px + w, py + h, px, py + h, r);
+    x.arcTo(px, py + h, px, py, r);
+    x.arcTo(px, py, px + w, py, r);
+    x.closePath();
+  }
+
+  function drawSpaced(x, text, cx, y, ls) {
+    const prev = x.textAlign;
+    x.textAlign = 'left';
+    const chars = [...text];
+    let tot = 0;
+    const ws = chars.map((ch) => {
+      const w = x.measureText(ch).width;
+      tot += w;
+      return w;
+    });
+    tot += ls * (chars.length - 1);
+    let px = cx - tot / 2;
+    chars.forEach((ch, i) => {
+      x.fillText(ch, px, y);
+      px += ws[i] + ls;
+    });
+    x.textAlign = prev;
+  }
+
+  const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lowPower = RM || window.matchMedia('(max-width: 900px)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: !lowPower, alpha: true });
+  } catch (err) {
+    console.warn('WebGL init failed for Books Showcase', err);
+    return;
+  }
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  if (renderer.outputEncoding !== undefined) {
+    renderer.outputEncoding = 3001; // sRGBEncoding
+  }
+  renderer.shadowMap.enabled = !lowPower;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 100);
+  camera.position.set(0, 0.1, 9.6);
+
+  // Lights
+  const hemi = new THREE.HemisphereLight(0x8fa0d8, 0x050814, 0.55);
+  scene.add(hemi);
+  const key = new THREE.DirectionalLight(0xffffff, 0.95);
+  key.position.set(3.5, 5, 6);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  scene.add(key);
+
+  const fill = new THREE.DirectionalLight(0x38bdf8, 0.35);
+  fill.position.set(-4, 1, 4);
+  scene.add(fill);
+
+  const bookRoot = new THREE.Group();
+  scene.add(bookRoot);
+
+  function tex(c) {
+    const t = new THREE.CanvasTexture(c);
+    t.generateMipmaps = true;
+    return t;
+  }
+
+  // Preload project screenshots
+  const loadedImages = {};
+  PROJECTS.forEach((proj) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = proj.image;
+    img.onload = () => {
+      loadedImages[proj.id] = img;
+      // Repaint front cover with loaded screenshot
+      const b = bookInstances.find((item) => item.cfg.id === proj.id);
+      if (b && b.mFront) {
+        const c = mkCanvas(1024, 1536);
+        paintProjectFront(c.getContext('2d'), 1024, 1536, proj, img);
+        b.mFront.map = tex(c);
+        b.mFront.needsUpdate = true;
+      }
+    };
+  });
+
+  // Front Cover Painter
+  function paintProjectFront(ctx, w, h, proj, img) {
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, '#0d1322');
+    bgGrad.addColorStop(0.4, '#090d18');
+    bgGrad.addColorStop(1, '#04060c');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Subtle colored ambient glow
+    const radial = ctx.createRadialGradient(w / 2, h * 0.3, 40, w / 2, h * 0.3, w * 0.7);
+    radial.addColorStop(0, proj.accentColor + '30');
+    radial.addColorStop(1, 'transparent');
+    ctx.fillStyle = radial;
+    ctx.fillRect(0, 0, w, h);
+
+    // Eyebrow tag
+    ctx.fillStyle = proj.accentColor;
+    ctx.font = '700 30px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(proj.category, 65, 105);
+
+    // Main Title
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 74px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(proj.title, 65, 185);
+
+    // Framed Browser Window
+    const winX = 60;
+    const winY = 230;
+    const winW = w - 120;
+    const winH = 760;
+    const winR = 24;
+
+    ctx.save();
+    ctx.fillStyle = '#111726';
+    rr(ctx, winX, winY, winW, winH, winR);
+    ctx.fill();
+    ctx.restore();
+
+    // Browser header bar
+    ctx.fillStyle = '#1a2338';
+    ctx.beginPath();
+    ctx.moveTo(winX + winR, winY);
+    ctx.arcTo(winX + winW, winY, winX + winW, winY + 45, winR);
+    ctx.lineTo(winX + winW, winY + 45);
+    ctx.lineTo(winX, winY + 45);
+    ctx.arcTo(winX, winY, winX + winR, winY, winR);
+    ctx.closePath();
+    ctx.fill();
+
+    // 3 Dots
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath(); ctx.arc(winX + 24, winY + 22, 6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath(); ctx.arc(winX + 44, winY + 22, 6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#10b981';
+    ctx.beginPath(); ctx.arc(winX + 64, winY + 22, 6, 0, Math.PI * 2); ctx.fill();
+
+    // URL bar
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    rr(ctx, winX + 88, winY + 10, winW - 176, 25, 12);
+    ctx.fill();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '600 16px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(proj.liveUrl.replace('https://', ''), winX + winW / 2, winY + 28);
+    ctx.textAlign = 'left';
+
+    // Screenshot image
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.save();
+      rr(ctx, winX, winY + 45, winW, winH - 45, 0);
+      ctx.clip();
+      ctx.drawImage(img, winX, winY + 45, winW, winH - 45);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(winX, winY + 45, winW, winH - 45);
+      ctx.fillStyle = '#64748b';
+      ctx.font = '600 24px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Project Preview Loading...', winX + winW / 2, winY + winH / 2);
+      ctx.textAlign = 'left';
+    }
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+    ctx.lineWidth = 2;
+    rr(ctx, winX, winY, winW, winH, winR);
+    ctx.stroke();
+
+    // Tagline below screenshot
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 38px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(proj.tagline, 65, 1050);
+
+    // Tech stack badges
+    let chipX = 65;
+    const chipY = 1085;
+    proj.tech.forEach((t) => {
+      ctx.font = '600 22px "Plus Jakarta Sans", sans-serif';
+      const tw = ctx.measureText(t).width;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      rr(ctx, chipX, chipY, tw + 32, 42, 21);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+      ctx.lineWidth = 1.5;
+      rr(ctx, chipX, chipY, tw + 32, 42, 21);
+      ctx.stroke();
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillText(t, chipX + 16, chipY + 29);
+      chipX += tw + 44;
+    });
+
+    // Signature footer
+    ctx.fillStyle = '#64748b';
+    ctx.font = '600 20px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('ABHISHEK PATIL · PORTFOLIO EDITION', 65, 1420);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = proj.accentColor;
+    ctx.fillText(proj.status.toUpperCase(), w - 65, 1420);
+    ctx.textAlign = 'left';
+
+    // Book border
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(30, 30, w - 60, h - 60);
+  }
+
+  // Spine Painter
+  function paintSpine(ctx, w, h, proj) {
+    ctx.fillStyle = proj.spineBg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.translate(w / 2, h / 2);
+    ctx.rotate(Math.PI / 2);
+    ctx.fillStyle = proj.spineInk;
+    ctx.font = '800 42px "Plus Jakarta Sans", sans-serif';
+    drawSpaced(ctx, proj.title.toUpperCase(), -h * 0.12, 14, 5);
+    ctx.globalAlpha = 0.85;
+    ctx.font = '600 24px "Plus Jakarta Sans", sans-serif';
+    drawSpaced(ctx, proj.author.toUpperCase(), h * 0.32, 9, 3);
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    ctx.fillStyle = proj.spineInk;
+    ctx.globalAlpha = 0.6;
+    ctx.fillRect(w / 2 - 25, 80, 50, 3);
+    ctx.fillRect(w / 2 - 25, h - 85, 50, 3);
+    ctx.globalAlpha = 1;
+  }
+
+  // Back Cover Painter
+  function paintBack(ctx, w, h, proj) {
+    ctx.fillStyle = proj.spineBg;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 48px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(proj.title, 80, 160);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.font = '400 26px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(proj.desc.slice(0, 75) + '...', 80, 230);
+
+    // Barcode block
+    ctx.fillStyle = '#ffffff';
+    rr(ctx, w - 340, h - 240, 260, 140, 10);
+    ctx.fill();
+    ctx.fillStyle = '#111827';
+    let bx = w - 320;
+    while (bx < w - 100) {
+      const bw = 2 + Math.random() * 5;
+      if (Math.random() > 0.35) ctx.fillRect(bx, h - 220, bw, 80);
+      bx += bw + 2 + Math.random() * 4;
+    }
+    ctx.font = '600 18px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('9 780123 456789', w - 210, h - 120);
+    ctx.textAlign = 'left';
+  }
+
+  // Index Page (Inside book when opened)
+  function makeIndexPageTex(proj) {
+    const w = 1024, h = 1536;
+    const c = mkCanvas(w, h);
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#f4eedf';
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.fillStyle = '#1e293b';
+    ctx.textAlign = 'center';
+    ctx.font = '800 76px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText('PROJECT INDEX', w / 2, 190);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(200, 225, w - 400, 3);
+
+    ctx.textAlign = 'left';
+    ctx.font = '600 42px "Plus Jakarta Sans", sans-serif';
+    let y = 330;
+    const chapters = proj.chapters || ['Architecture Overview', 'Component Hierarchy', 'API Contracts', 'Deployment Pipeline'];
+    chapters.forEach((chap, i) => {
+      ctx.fillStyle = '#334155';
+      ctx.fillText(`0${i + 1}. ${chap}`, 120, y);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText(`p. ${12 + i * 14}`, w - 120, y);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba(0,0,0,0.08)';
+      ctx.fillRect(120, y + 16, w - 240, 2);
+      y += 110;
+    });
+
+    return tex(c);
+  }
+
+  // Geometry
+  const W = 1.42, H = 2.14, T = 0.34, CT = 0.032, OV = 0.05;
+  const PAGE_N = 8, BACK_PAGE_N = 4;
+  const PW = W - 0.02, PH = H - 0.02;
+  const BLOCK_D = 0.245, BLOCK_Z = -0.0205, PIVOT_Z = T / 2 + CT / 2, BPIVOT_Z = -(T / 2 + CT / 2), HINGE_OVERLAP = 0.05;
+
+  const coverGeo = new THREE.BoxGeometry(W + OV, H + OV * 2, CT);
+  const blockGeo = new THREE.BoxGeometry(W - 0.015, H, BLOCK_D);
+  const pageGeo = new THREE.PlaneGeometry(PW, PH);
+  const spineGeo = new THREE.BoxGeometry(0.028, H + OV * 2, T + CT * 2 + 0.006);
+  const hitGeo = new THREE.BoxGeometry(1.8, 2.5, 1.15);
+  const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+
+  function std(o) {
+    return new THREE.MeshStandardMaterial(Object.assign({ metalness: 0.02 }, o));
+  }
+
+  const paperEdgeMat = std({ color: 0xeae0cc, roughness: 0.85 });
+  const pageMats = [0xf5efde, 0xf0e9d6, 0xfaf4e5].map((c) => std({ color: c, roughness: 0.9, side: THREE.DoubleSide }));
+
+  const bookInstances = [];
+  const hitMeshes = [];
+
+  PROJECTS.forEach((proj, index) => {
+    const rootGrp = new THREE.Group();
+    const floatGrp = new THREE.Group();
+    rootGrp.add(floatGrp);
+    bookRoot.add(rootGrp);
+
+    const indexPageMat = std({ map: makeIndexPageTex(proj), roughness: 0.9, side: THREE.DoubleSide });
+
+    // Front Cover canvas
+    const frontCanvas = mkCanvas(1024, 1536);
+    paintProjectFront(frontCanvas.getContext('2d'), 1024, 1536, proj, loadedImages[proj.id]);
+    const mFront = std({ map: tex(frontCanvas), roughness: 0.45 });
+
+    // Back Cover canvas
+    const backCanvas = mkCanvas(1024, 1536);
+    paintBack(backCanvas.getContext('2d'), 1024, 1536, proj);
+    const mBack = std({ map: tex(backCanvas), roughness: 0.55 });
+
+    // Spine canvas
+    const spineCanvas = mkCanvas(220, 1536);
+    paintSpine(spineCanvas.getContext('2d'), 220, 1536, proj);
+    const mSpine = std({ map: tex(spineCanvas), roughness: 0.65 });
+
+    const mEdge = std({ color: '#2a3447', roughness: 0.6 });
+
+    // Back Pivot
+    const backPivot = new THREE.Group();
+    backPivot.position.set(-W / 2 - HINGE_OVERLAP, 0, BPIVOT_Z);
+    const backMesh = new THREE.Mesh(coverGeo, [mEdge, mEdge, mEdge, mEdge, paperEdgeMat, mBack]);
+    backMesh.position.x = (W + OV) / 2;
+    backPivot.add(backMesh);
+    floatGrp.add(backPivot);
+
+    // Front Pivot
+    const pivot = new THREE.Group();
+    pivot.position.set(-W / 2 - HINGE_OVERLAP, 0, PIVOT_Z);
+    const frontMesh = new THREE.Mesh(coverGeo, [mEdge, mEdge, mEdge, mEdge, mFront, paperEdgeMat]);
+    frontMesh.position.x = (W + OV) / 2;
+    pivot.add(frontMesh);
+    floatGrp.add(pivot);
+
+    // Spine
+    const spine = new THREE.Mesh(spineGeo, mSpine);
+    spine.position.set(-W / 2 - 0.013, 0, 0);
+    floatGrp.add(spine);
+
+    // Paper Block
+    const block = new THREE.Mesh(blockGeo, [paperEdgeMat, paperEdgeMat, paperEdgeMat, paperEdgeMat, paperEdgeMat, paperEdgeMat]);
+    block.position.set(-0.0075, 0, BLOCK_Z);
+    floatGrp.add(block);
+
+    // Pages inside
+    const pages = [], pageF = [];
+    for (let i = 0; i < PAGE_N; i++) {
+      const pp = new THREE.Group();
+      pp.position.set(-W / 2 + 0.01, 0, 0.166 - i * 0.005);
+      const pm = new THREE.Mesh(pageGeo, i === 0 ? indexPageMat : pageMats[i % 3]);
+      pm.position.x = PW / 2;
+      pp.add(pm);
+      floatGrp.add(pp);
+      pages.push(pp);
+      pageF.push(0.32 * Math.pow(1 - i / PAGE_N, 2.5));
+    }
+
+    // Hit box
+    const hit = new THREE.Mesh(hitGeo, hitMat);
+    floatGrp.add(hit);
+
+    const springs = {
+      px: new Spring(0, 18, 7),
+      py: new Spring(0, 18, 7),
+      pz: new Spring(0, 18, 7),
+      rx: new Spring(0, 18, 7),
+      ry: new Spring(0, 18, 7),
+      rz: new Spring(0, 18, 7),
+      sc: new Spring(1, 18, 7),
+      tiltX: new Spring(0, 120, 13),
+      tiltY: new Spring(0, 120, 13),
+      lift: new Spring(0, 120, 13),
+      cover: new Spring(0, 90, 12),
+      coverB: new Spring(0, 90, 12),
+    };
+
+    const book = {
+      cfg: proj,
+      index,
+      root: rootGrp,
+      float: floatGrp,
+      pivot,
+      backPivot,
+      mFront,
+      spine,
+      block,
+      pages,
+      pageF,
+      hit,
+      springs,
+      phase: Math.random() * 6.28,
+      slotScale: 1,
+      scr: { x: 0, y: 0 },
+      orbY: 0,
+      orbYv: 0,
+      orbPhase: 'idle',
+      orbTarget: 0,
+    };
+
+    bookInstances.push(book);
+  });
+
+  const bookByHit = (m) => bookInstances.find((b) => b.hit === m);
+
+  // Layout slots
+  const dims = { w: 0, h: 0 };
+  const SLOTS = { hero: [], detail: null, portrait: false };
+
+  function computeSlots() {
+    const a = dims.w / Math.max(1, dims.h);
+    const portrait = a < 0.88;
+    SLOTS.portrait = portrait;
+    const fit = portrait ? clamp(a / 1.05, 0.45, 0.78) : clamp(a / 1.6, 0.65, 1);
+    bookRoot.scale.setScalar(fit);
+    bookRoot.position.y = -(1 - fit) * 0.25;
+
+    SLOTS.hero = portrait
+      ? [
+        { p: [-1.35, -0.45, -0.1], r: [-0.04, 0.38, 0.17], s: 1.25 },
+        { p: [0.15, -0.2, 0.65], r: [-0.05, -0.1, -0.03], s: 1.35 },
+        { p: [1.6, -0.5, -0.3], r: [-0.04, -0.4, -0.16], s: 1.25 },
+      ]
+      : [
+        { p: [-2.1, -0.45, -0.1], r: [-0.045, 0.4, 0.18], s: 1.25 },
+        { p: [0.2, -0.28, 0.65], r: [-0.05, -0.1, -0.035], s: 1.36 },
+        { p: [2.35, -0.52, -0.3], r: [-0.045, -0.42, -0.17], s: 1.25 },
+      ];
+
+    SLOTS.detail = portrait
+      ? { p: [0, 0.45, 0.75], r: [-0.02, -0.4, 0.05], s: 0.85 }
+      : { p: [-1.65, 0.0, 0.85], r: [0.02, -0.44, 0.08], s: 1.08 };
+  }
+
+  function setTargets(b, slot) {
+    const s = b.springs;
+    s.px.t = slot.p[0];
+    s.py.t = slot.p[1];
+    s.pz.t = slot.p[2];
+    s.rx.t = slot.r[0];
+    s.ry.t = slot.r[1];
+    s.rz.t = slot.r[2];
+    b.slotScale = slot.s;
+  }
+
+  let carouselStart = 0;
+  function windowIndices(start, total, count) {
+    const arr = [];
+    for (let i = 0; i < count; i++) arr.push((start + i) % total);
+    return arr;
+  }
+  let currentWindow = windowIndices(0, N, VISIBLE);
+  let carouselBusy = false;
+
+  function rebuildHitMeshes() {
+    hitMeshes.length = 0;
+    currentWindow.forEach((bi) => hitMeshes.push(bookInstances[bi].hit));
+  }
+
+  function applyMode() {
+    if (state.mode === 'hero' || state.mode === 'closing') {
+      currentWindow.forEach((bi, i) => {
+        const slot = SLOTS.hero[i];
+        if (slot) setTargets(bookInstances[bi], slot);
+      });
+    } else if (state.selected) {
+      setTargets(state.selected, SLOTS.detail);
+    }
+  }
+
+  function shiftCarousel(dir) {
+    if (carouselBusy || state.mode !== 'hero' || N <= VISIBLE) return;
+    carouselBusy = true;
+    const outgoing = currentWindow;
+    carouselStart = (((carouselStart + dir) % N) + N) % N;
+    const incoming = windowIndices(carouselStart, N, VISIBLE);
+
+    const toHide = outgoing.filter((bi) => !incoming.includes(bi));
+    toHide.forEach((bi) => {
+      const oldIdx = outgoing.indexOf(bi);
+      const slot = SLOTS.hero[oldIdx];
+      const b = bookInstances[bi];
+      if (slot) b.springs.px.t = slot.p[0] - dir * 6.5;
+    });
+    setTimeout(() => {
+      toHide.forEach((bi) => { bookInstances[bi].root.visible = false; });
+    }, 600);
+
+    incoming.forEach((bi, i) => {
+      const slot = SLOTS.hero[i];
+      if (!slot) return;
+      const b = bookInstances[bi];
+      b.root.visible = true;
+      if (!outgoing.includes(bi)) {
+        b.springs.px.set(slot.p[0] + dir * 6.5);
+        b.springs.py.set(slot.p[1]);
+        b.springs.pz.set(slot.p[2]);
+        b.springs.rx.set(slot.r[0]);
+        b.springs.ry.set(slot.r[1]);
+        b.springs.rz.set(slot.r[2]);
+        b.springs.sc.set(slot.s * 0.9);
+      }
+      setTargets(b, slot);
+    });
+
+    currentWindow = incoming;
+    rebuildHitMeshes();
+    setTimeout(() => { carouselBusy = false; }, 650);
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', () => shiftCarousel(-1));
+  if (nextBtn) nextBtn.addEventListener('click', () => shiftCarousel(1));
+
+  // State
+  const state = {
+    mode: 'hero',
+    selected: null,
+    hovered: null,
+  };
+
+  const camX = new Spring(0, 14, 7),
+    camY = new Spring(0.1, 14, 7),
+    camZ = new Spring(9.6, 14, 7);
+  const lookX = new Spring(0, 14, 7),
+    lookY = new Spring(0, 14, 7);
+
+  function camTo(mode) {
+    if (mode === 'detail') {
+      camX.t = SLOTS.portrait ? 0 : -0.22;
+      camZ.t = SLOTS.portrait ? 10.2 : 9.6;
+      lookX.t = SLOTS.portrait ? 0 : -0.32;
+      lookY.t = SLOTS.portrait ? 0 : 0.12;
+    } else {
+      camX.t = 0;
+      camZ.t = 9.6;
+      lookX.t = 0;
+      lookY.t = 0;
+    }
+  }
+
+  // Populate Detail Panel
+  function updateDetailPanel(cfg) {
+    if (!cfg) return;
+    document.getElementById('detailCategory').textContent = cfg.category;
+    document.getElementById('detailTitle').textContent = cfg.title;
+    document.getElementById('detailDesc').textContent = cfg.desc;
+    document.getElementById('detailStatus').textContent = cfg.status;
+    document.getElementById('detailYear').textContent = cfg.year;
+
+    // Tech chips
+    const techBox = document.getElementById('detailTech');
+    techBox.innerHTML = cfg.tech.map((t) => `<span class="tech-chip">${t}</span>`).join('');
+
+    const liveBtn = document.getElementById('detailLiveBtn');
+    const repoBtn = document.getElementById('detailRepoBtn');
+    const repoText = document.getElementById('detailRepoText');
+    const liveText = document.getElementById('detailLiveText');
+
+    if (cfg.id === 'orca-marine') {
+      liveBtn.style.display = 'none';
+      repoBtn.href = cfg.repoUrl;
+      repoText.textContent = 'View on GitHub';
+    } else {
+      liveBtn.style.display = 'inline-flex';
+      liveBtn.href = cfg.liveUrl;
+      liveText.textContent = 'Launch Live Demo';
+      repoBtn.href = cfg.repoUrl;
+      repoText.textContent = 'GitHub Repo';
+    }
+  }
+
+  function open(book) {
+    if (state.mode !== 'hero' || !book) return;
+    state.mode = 'opening';
+    state.selected = book;
+    if (openSlip) openSlip.classList.remove('is-visible');
+    root.classList.add('detail-open');
+    updateDetailPanel(book.cfg);
+    computeSlots();
+
+    currentWindow.forEach((bi) => {
+      const b = bookInstances[bi];
+      if (b !== book) {
+        b.springs.py.t = -5.0;
+        setTimeout(() => { b.root.visible = false; }, 600);
+      }
+    });
+
+    setTimeout(() => {
+      book.orbY = 0;
+      book.orbYv = 0;
+      applyMode();
+      camTo('detail');
+    }, 400);
+
+    setTimeout(() => {
+      state.mode = 'detail';
+    }, 900);
+  }
+
+  function close() {
+    if (state.mode !== 'detail') return;
+    state.mode = 'closing';
+    root.classList.remove('detail-open');
+    orbit.drag = false;
+
+    applyMode();
+    camTo('hero');
+
+    currentWindow.forEach((bi, i) => {
+      const bk = bookInstances[bi];
+      bk.root.visible = true;
+      const slot = SLOTS.hero[i];
+      if (slot) setTargets(bk, slot);
+    });
+
+    setTimeout(() => {
+      state.mode = 'hero';
+      state.selected = null;
+    }, 850);
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', close);
+
+  // Raycasting & Pointer Tracking
+  const ptr = {
+    cx: 0, cy: 0, ndcX: 0, ndcY: 0,
+    down: false, downX: 0, downY: 0, moved: 0, t0: 0,
+  };
+  const orbit = { drag: false, dx: 0, dy: 0 };
+  const ray = new THREE.Raycaster();
+  const tmpV = new THREE.Vector3();
+  let dragBook = null, rayBook = null;
+
+  function localXY(e) {
+    const r = root.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  function castRay() {
+    ray.setFromCamera({ x: ptr.ndcX, y: ptr.ndcY }, camera);
+    const hits = ray.intersectObjects(hitMeshes, false);
+    if (hits.length) {
+      rayBook = bookByHit(hits[0].object);
+    } else {
+      rayBook = null;
+    }
+  }
+
+  canvasEl.addEventListener('pointermove', (e) => {
+    const { x, y } = localXY(e);
+    const dxN = (x - ptr.cx) / dims.w;
+    const dyN = (y - ptr.cy) / dims.h;
+    ptr.cx = x;
+    ptr.cy = y;
+    ptr.ndcX = (x / dims.w) * 2 - 1;
+    ptr.ndcY = -(y / dims.h) * 2 + 1;
+
+    if (ptr.down && orbit.drag) {
+      orbit.dx += dxN;
+      orbit.dy += dyN;
+      ptr.moved += Math.abs(dxN * dims.w) + Math.abs(dyN * dims.h);
+    }
+  });
+
+  canvasEl.addEventListener('pointerdown', (e) => {
+    const { x, y } = localXY(e);
+    ptr.cx = x; ptr.cy = y;
+    ptr.downX = x; ptr.downY = y;
+    ptr.down = true;
+    ptr.moved = 0;
+    ptr.t0 = performance.now();
+    ptr.ndcX = (x / dims.w) * 2 - 1;
+    ptr.ndcY = -(y / dims.h) * 2 + 1;
+    castRay();
+
+    if (state.mode === 'hero' && rayBook) {
+      dragBook = rayBook;
+    } else if (state.mode === 'detail' && rayBook === state.selected) {
+      orbit.drag = true;
+      orbit.dx = 0;
+      orbit.dy = 0;
+    }
+  });
+
+  window.addEventListener('pointerup', () => {
+    orbit.drag = false;
+    if (dragBook) {
+      const wasDrag = ptr.moved > 16;
+      if (!wasDrag && state.mode === 'hero' && performance.now() - ptr.t0 < 500) {
+        open(dragBook);
+      }
+      dragBook = null;
+    }
+    ptr.down = false;
+  });
+
+  // Tick loop
+  let lastT = performance.now();
+  const DETAIL_OPEN_ANGLE = 0.88;
+
+  function tickBook(b, dt, t) {
+    const s = b.springs;
+    const isHov = state.hovered === b;
+    const inDetail = state.mode === 'detail' && state.selected === b;
+    const orbitActive = state.selected === b && state.mode !== 'hero';
+
+    if (orbitActive) {
+      if (orbit.drag && inDetail) {
+        const step = orbit.dx * 6.2;
+        orbit.dx = 0;
+        b.orbY += step;
+      }
+    }
+
+    let coverBase = 0;
+    if (inDetail) coverBase = DETAIL_OPEN_ANGLE;
+
+    if (isHov && state.mode === 'hero') {
+      const dxN = (ptr.cx - b.scr.x) / (dims.w * 0.25);
+      const dyN = (b.scr.y - ptr.cy) / (dims.h * 0.3);
+      s.tiltY.t = clamp(dxN * 0.28, -0.15, 0.15);
+      s.tiltX.t = clamp(-dyN * 0.1, -0.09, 0.1);
+      s.lift.t = 0.28;
+    } else {
+      s.tiltY.t = 0;
+      s.tiltX.t = 0;
+      s.lift.t = 0;
+    }
+
+    s.cover.t = coverBase;
+    s.sc.t = b.slotScale * (isHov && state.mode === 'hero' ? 1.08 : 1);
+
+    s.px.update(dt);
+    s.py.update(dt);
+    s.pz.update(dt);
+    s.rx.update(dt);
+    s.ry.update(dt);
+    s.rz.update(dt);
+    s.sc.update(dt);
+    s.tiltX.update(dt);
+    s.tiltY.update(dt);
+    s.lift.update(dt);
+    s.cover.update(dt);
+
+    b.float.position.y = Math.sin(t * 0.7 + b.phase) * 0.035;
+
+    b.root.position.set(s.px.v, s.py.v, s.pz.v + s.lift.v);
+    b.root.rotation.set(s.rx.v + s.tiltX.v, s.ry.v + s.tiltY.v + b.orbY, s.rz.v);
+    b.root.scale.setScalar(Math.max(s.sc.v, 0.001));
+
+    const ang = Math.max(0, s.cover.v);
+    b.pivot.rotation.y = -ang;
+    b.pivot.position.z = PIVOT_Z + ang * 0.022;
+
+    for (let i = 0; i < PAGE_N; i++) {
+      b.pages[i].rotation.y = -ang * b.pageF[i];
+    }
+  }
+
+  function screenPos(b) {
+    b.root.getWorldPosition(tmpV).project(camera);
+    b.scr.x = (tmpV.x * 0.5 + 0.5) * dims.w;
+    b.scr.y = (-tmpV.y * 0.5 + 0.5) * dims.h;
+  }
+
+  function frameLoop(now) {
+    requestAnimationFrame(frameLoop);
+    const dt = Math.min((now - lastT) / 1000, 0.05);
+    lastT = now;
+    const t = now / 1000;
+
+    castRay();
+    let hov = null;
+    if (state.mode === 'hero') hov = rayBook;
+    state.hovered = hov;
+
+    canvasEl.style.cursor = (state.mode === 'hero' && hov) ? 'pointer' : (state.mode === 'detail' ? 'grab' : 'default');
+
+    bookInstances.forEach((b) => screenPos(b));
+    bookInstances.forEach((b) => tickBook(b, dt, t));
+
+    // Open slip cursor follower
+    if (openSlip) {
+      if (state.mode === 'hero' && state.hovered) {
+        openSlip.style.left = `${ptr.cx}px`;
+        openSlip.style.top = `${ptr.cy + 35}px`;
+        openSlip.classList.add('is-visible');
+      } else {
+        openSlip.classList.remove('is-visible');
+      }
+    }
+
+    camera.position.set(camX.update(dt), camY.update(dt), camZ.update(dt));
+    camera.lookAt(lookX.update(dt), lookY.update(dt), 0);
+
+    renderer.render(scene, camera);
+  }
+
+  function resize() {
+    const r = root.getBoundingClientRect();
+    dims.w = Math.max(1, Math.round(r.width));
+    dims.h = Math.max(1, Math.round(r.height));
+    renderer.setSize(dims.w, dims.h);
+    camera.aspect = dims.w / dims.h;
+    camera.updateProjectionMatrix();
+    computeSlots();
+    applyMode();
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  currentWindow.forEach((bi, i) => {
+    const b = bookInstances[bi];
+    const slot = SLOTS.hero[i];
+    if (slot) {
+      b.springs.px.set(slot.p[0]);
+      b.springs.py.set(slot.p[1] - 3.5);
+      b.springs.pz.set(slot.p[2]);
+      b.springs.rx.set(slot.r[0]);
+      b.springs.ry.set(slot.r[1]);
+      b.springs.rz.set(slot.r[2]);
+      b.springs.sc.set(slot.s);
+      b.slotScale = slot.s;
+      setTimeout(() => setTargets(b, slot), 150 + i * 140);
+    }
+  });
+
+  bookInstances.forEach((b, idx) => {
+    if (!currentWindow.includes(idx)) b.root.visible = false;
+  });
+  rebuildHitMeshes();
+  camTo('hero');
+
+  requestAnimationFrame(frameLoop);
 }
 
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {
