@@ -159,9 +159,8 @@ function createParticles(assembleAnimation = true) {
   const offscreen = document.createElement('canvas');
   const offCtx = offscreen.getContext('2d');
 
-  // Scale portrait so it aligns big and fills more space prominently
-  // ~92% of viewport height matching Hasibul Hasan's large hero presence
-  const targetHeight = Math.min(canvas.height * 0.92, 820);
+  // Scale portrait bigger to cover more space prominently
+  const targetHeight = Math.min(canvas.height * 1.16, 960);
   const aspect = portraitImg.width / portraitImg.height;
   const targetWidth = targetHeight * aspect;
 
@@ -171,9 +170,9 @@ function createParticles(assembleAnimation = true) {
 
   const imgData = offCtx.getImageData(0, 0, targetWidth, targetHeight).data;
 
-  // Center horizontally and vertically
+  // Align exactly in the middle horizontally, with face centered vertically
   const startX = (canvas.width - targetWidth) / 2;
-  const startY = (canvas.height - targetHeight) / 2 + 10;
+  const startY = 52;
 
   // Step size: 4.2px maintains the signature cyber mosaic tile look
   const step = 4.2;
