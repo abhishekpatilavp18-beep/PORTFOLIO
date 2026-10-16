@@ -2485,12 +2485,14 @@ function initBreakoutGame() {
     ctx.clearRect(0, 0, state.width, state.height);
     ctx.drawImage(state.layer, 0, 0, state.width, state.height);
 
-    if (state.phase !== 'playing' && state.phase !== 'attract') return;
+    // Only draw paddle and ball when actively playing!
+    // Before pressing PLAY, the paddle bar is hidden so it never overlaps the PLAY button.
+    if (state.phase !== 'playing') return;
 
     const { paddle, ball, radius } = state;
     ctx.fillStyle = state.accent;
 
-    // Paddle
+    // Paddle Bar
     const px = paddle.x - paddle.w / 2;
     if (ctx.roundRect) {
       ctx.beginPath();
@@ -2538,6 +2540,7 @@ function initBreakoutGame() {
       statusText.className = 'breakout-status-text show won';
       actionBtn.textContent = 'AGAIN';
     } else {
+      statusText.textContent = '';
       statusText.className = 'breakout-status-text';
       actionBtn.textContent = 'PLAY';
     }
@@ -2574,7 +2577,7 @@ function initBreakoutGame() {
     const layerCtx = layer.getContext('2d');
     layerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const phase = forcePlay ? 'playing' : (state?.phase === 'playing' ? 'playing' : 'attract');
+    const phase = forcePlay ? 'playing' : (state?.phase === 'playing' ? 'playing' : 'idle');
 
     state = {
       width: w,
@@ -2596,7 +2599,7 @@ function initBreakoutGame() {
         x: w / 2,
         w: clampVal(w * 0.24, 64, 180),
         h: clampVal(cellSize * 0.8, 6, 12),
-        y: h - Math.max(68, cellSize * 4.2)
+        y: h - Math.max(34, cellSize * 3.0)
       },
       ball: { x: w / 2, y: 0, vx: 0, vy: 0 },
       baseSpeed: clampVal(h * 0.48, 180, 440) * speedMultiplier,
@@ -2643,13 +2646,9 @@ function initBreakoutGame() {
     const hits = checkBrickCollisions();
     if (!hits.length) return;
 
-    const isAttract = state.phase === 'attract';
     hits.forEach((idx) => {
       state.grid[idx] = BRICK_BROKEN;
       state.standing--;
-      if (isAttract) {
-        state.regrow.push({ cell: idx, at: state.clock + REGROW_DELAY });
-      }
     });
 
     state.layerDirty = true;
@@ -2677,25 +2676,6 @@ function initBreakoutGame() {
 
   function stepPhysics(dt) {
     const { ball, paddle, radius } = state;
-    const isAttract = state.phase === 'attract';
-
-    state.clock += dt;
-    while (state.regrow.length && state.regrow[0].at <= state.clock) {
-      const item = state.regrow.shift();
-      if (state.grid[item.cell] === BRICK_BROKEN) {
-        state.grid[item.cell] = BRICK_SOLID;
-        state.standing++;
-        state.layerDirty = true;
-      }
-    }
-
-    if (isAttract && !state.serving) {
-      paddle.x = clampVal(
-        paddle.x + (ball.x - paddle.x) * Math.min(1, dt * 7),
-        paddle.w / 2,
-        state.width - paddle.w / 2
-      );
-    }
 
     if (state.serving) {
       ball.x = paddle.x;
@@ -2739,20 +2719,16 @@ function initBreakoutGame() {
     }
 
     if (ball.y - radius > state.height) {
-      if (isAttract) {
-        resetServe();
+      state.lives--;
+      updateUI();
+      if (state.lives <= 0) {
+        setPhase('over');
       } else {
-        state.lives--;
-        updateUI();
-        if (state.lives <= 0) {
-          setPhase('over');
-        } else {
-          resetServe();
-        }
+        resetServe();
       }
     }
 
-    if (!isAttract && state.standing === 0) {
+    if (state.standing === 0) {
       setPhase('won');
     }
   }
@@ -2765,7 +2741,7 @@ function initBreakoutGame() {
     const delta = state.last ? Math.min((now - state.last) / 1000, 4 * SUBSTEP) : 0;
     state.last = now;
 
-    if (state.phase === 'playing' || state.phase === 'attract') {
+    if (state.phase === 'playing') {
       state.acc += delta;
       let iters = 0;
       while (state.acc >= SUBSTEP && iters < 4) {
@@ -2781,40 +2757,31 @@ function initBreakoutGame() {
 
   function launchGame() {
     if (!state) return;
-    if (state.phase !== 'playing') {
-      resetBoard(true);
-    }
+    resetBoard(true);
     state.phase = 'playing';
-    if (state.serving) {
-      state.ball.x = state.paddle.x;
-      state.ball.y = state.paddle.y - state.radius - 1;
-      state.serving = false;
-      state.serveDelay = Infinity;
-      state.ball.vx = state.baseSpeed * 0.35 * (Math.random() < 0.5 ? -1 : 1);
-      state.ball.vy = -state.baseSpeed;
-    }
+    state.serving = false;
+    state.serveDelay = Infinity;
+    state.ball.x = state.paddle.x;
+    state.ball.y = state.paddle.y - state.radius - 1;
+    state.ball.vx = state.baseSpeed * 0.35 * (Math.random() < 0.5 ? -1 : 1);
+    state.ball.vy = -state.baseSpeed;
     updateUI();
+    renderFrame();
   }
 
   function movePaddleTo(x) {
-    if (!state) return;
+    if (!state || state.phase !== 'playing') return;
     state.paddle.x = clampVal(x, state.paddle.w / 2, state.width - state.paddle.w / 2);
   }
 
+  // Pointer movement only moves paddle when playing
   panel.addEventListener('pointermove', (e) => {
+    if (!state || state.phase !== 'playing') return;
     const rect = panel.getBoundingClientRect();
-    if (state?.phase === 'attract') {
-      launchGame();
-    }
     movePaddleTo(e.clientX - rect.left);
   }, { passive: true });
 
-  panel.addEventListener('pointerdown', (e) => {
-    if (!e.target.closest('#breakoutActionBtn')) {
-      launchGame();
-    }
-  });
-
+  // Clicking the Play / Again button explicitly launches the game
   actionBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     launchGame();
@@ -2823,16 +2790,20 @@ function initBreakoutGame() {
   panel.addEventListener('keydown', (e) => {
     const step = (state?.cell ?? 8) * 4;
     if (e.key === 'ArrowLeft') {
-      if (state?.phase === 'attract') launchGame();
-      if (state) state.paddle.x = clampVal(state.paddle.x - step, state.paddle.w / 2, state.width - state.paddle.w / 2);
+      if (state && state.phase === 'playing') {
+        state.paddle.x = clampVal(state.paddle.x - step, state.paddle.w / 2, state.width - state.paddle.w / 2);
+      }
       e.preventDefault();
     } else if (e.key === 'ArrowRight') {
-      if (state?.phase === 'attract') launchGame();
-      if (state) state.paddle.x = clampVal(state.paddle.x + step, state.paddle.w / 2, state.width - state.paddle.w / 2);
+      if (state && state.phase === 'playing') {
+        state.paddle.x = clampVal(state.paddle.x + step, state.paddle.w / 2, state.width - state.paddle.w / 2);
+      }
       e.preventDefault();
     } else if (e.key === ' ' || e.key === 'Enter') {
-      launchGame();
-      e.preventDefault();
+      if (state && state.phase !== 'playing') {
+        launchGame();
+        e.preventDefault();
+      }
     }
   });
 

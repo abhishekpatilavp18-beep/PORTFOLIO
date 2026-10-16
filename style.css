@@ -1766,7 +1766,7 @@ body.intro-finished {
   overflow: hidden;
   user-select: none;
   outline: none;
-  cursor: pointer;
+  cursor: default;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -1824,12 +1824,13 @@ body.intro-finished {
   align-items: center;
   gap: 16px;
   z-index: 10;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
 }
 
 .breakout-action-bar.hidden {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
   transform: translateY(6px);
 }
 
