@@ -51,20 +51,118 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-// Ambient drifting dust/stars on pure black background
+// Floating Stardust & Cyber Particle beside Abhishek's Portrait
+class FloatingAuraParticle {
+  constructor(canvasWidth, canvasHeight, side) {
+    this.reset(canvasWidth, canvasHeight, side, true);
+  }
+
+  reset(width, height, side, initial = false) {
+    const portraitW = width * 0.44;
+    const portraitLeft = (width - portraitW) / 2;
+    const portraitRight = portraitLeft + portraitW;
+
+    // Distribute particles prominently on the left and right flanks beside the portrait
+    if (side === 'left') {
+      this.x = Math.random() * (portraitLeft + 25);
+    } else if (side === 'right') {
+      this.x = portraitRight - 25 + Math.random() * (width - portraitRight + 25);
+    } else {
+      this.x = Math.random() * width;
+    }
+
+    this.y = initial ? Math.random() * height : height + 10 + Math.random() * 30;
+    this.baseX = this.x;
+
+    // Very very small pinpoint particles (0.4px to 1.2px)
+    const r = Math.random();
+    if (r > 0.85) {
+      this.size = Math.random() * 0.3 + 1.0; // ~1.0 - 1.3px tiny pinpoint spark
+    } else if (r > 0.45) {
+      this.size = Math.random() * 0.3 + 0.7; // ~0.7 - 1.0px fine micro-dust
+    } else {
+      this.size = Math.random() * 0.3 + 0.4; // ~0.4 - 0.7px microscopic stardust
+    }
+
+    // Gentle upward float speed
+    this.speedY = -(Math.random() * 0.38 + 0.12);
+
+    // Subtle sinusoidal floating wave motion
+    this.swaySpeed = Math.random() * 0.018 + 0.006;
+    this.swayAmp = Math.random() * 18 + 6;
+    this.angle = Math.random() * Math.PI * 2;
+
+    // Twinkling pulse
+    this.baseAlpha = Math.random() * 0.45 + 0.35;
+    this.pulseSpeed = Math.random() * 0.03 + 0.01;
+    this.pulsePhase = Math.random() * Math.PI * 2;
+
+    // Luminous cyber palette matching theme
+    const colors = [
+      '56, 189, 248',   // Electric Cyan #38bdf8
+      '147, 197, 253',  // Ice Blue #93c5fd
+      '255, 255, 255',  // Starlight White
+      '96, 165, 250',   // Sapphire Blue #60a5fa
+      '192, 132, 252',  // Soft Violet
+      '203, 213, 225'   // Silver slate
+    ];
+    this.colorRgb = colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  update(width, height) {
+    this.angle += this.swaySpeed;
+    this.pulsePhase += this.pulseSpeed;
+
+    this.y += this.speedY;
+    this.x = this.baseX + Math.sin(this.angle) * this.swayAmp;
+
+    // Gentle mouse repulsion/breeze when cursor moves beside him
+    if (mouse.x !== null) {
+      const dx = this.x - mouse.x;
+      const dy = this.y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const repelDist = 120;
+      if (dist < repelDist && dist > 0) {
+        const force = (repelDist - dist) / repelDist;
+        this.baseX += (dx / dist) * force * 2.5;
+        this.y += (dy / dist) * force * 1.5;
+      }
+    }
+
+    // Re-spawn seamlessly at the bottom when floating past the top
+    if (this.y < -15) {
+      this.reset(width, height, this.x < width / 2 ? 'left' : 'right', false);
+    }
+    if (this.x < -20) this.baseX = width + 5;
+    if (this.x > width + 20) this.baseX = -5;
+  }
+
+  draw(ctx) {
+    const alpha = Math.max(0.12, Math.min(0.9, this.baseAlpha + Math.sin(this.pulsePhase) * 0.25));
+    ctx.fillStyle = `rgba(${this.colorRgb}, ${alpha})`;
+    ctx.fillRect(this.x, this.y, this.size, this.size);
+  }
+}
+
+// Rich floating cosmic particles in the space flanking Abhishek
 function initAmbientParticles() {
   ambientParticles = [];
-  // Richer starry field with ~250 ambient floating particles
-  const count = Math.floor((canvas.width * canvas.height) / 4500);
-  for (let i = 0; i < count; i++) {
-    ambientParticles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      size: Math.random() * 1.6 + 0.6,
-      speedX: (Math.random() - 0.5) * 0.25,
-      speedY: (Math.random() - 0.5) * 0.25,
-      alpha: Math.random() * 0.45 + 0.12
-    });
+  const width = canvas.width || window.innerWidth;
+  const height = canvas.height || window.innerHeight;
+
+  // 1. Dense floating field on the LEFT flank beside Abhishek (~360 particles)
+  for (let i = 0; i < 360; i++) {
+    ambientParticles.push(new FloatingAuraParticle(width, height, 'left'));
+  }
+
+  // 2. Dense floating field on the RIGHT flank beside Abhishek (~360 particles)
+  for (let i = 0; i < 360; i++) {
+    ambientParticles.push(new FloatingAuraParticle(width, height, 'right'));
+  }
+
+  // 3. Wide ambient background cosmic field (~180 particles)
+  for (let i = 0; i < 180; i++) {
+    ambientParticles.push(new FloatingAuraParticle(width, height, 'full'));
   }
 }
 
@@ -257,6 +355,19 @@ window.addEventListener('click', (e) => {
       p.vy -= Math.sin(angle) * force * 35;
     }
   }
+
+  // Also push ambient floating particles on click
+  for (let i = 0; i < ambientParticles.length; i++) {
+    const ap = ambientParticles[i];
+    const dx = clickX - ap.x;
+    const dy = clickY - ap.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < blastRadius && dist > 0) {
+      const force = (blastRadius - dist) / blastRadius;
+      ap.baseX += (dx / dist) * force * 18;
+      ap.y += (dy / dist) * force * 12;
+    }
+  }
 });
 
 // Render Loop
@@ -264,24 +375,13 @@ function animate() {
   ctx.fillStyle = '#000000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 1. Ambient space dust
+  // 1. Floating particles beside Abhishek and across cosmic space
   for (let i = 0; i < ambientParticles.length; i++) {
-    const star = ambientParticles[i];
-    if (introComplete) {
-      star.x += star.speedX;
-      star.y += star.speedY;
-
-      if (star.x < 0) star.x = canvas.width;
-      if (star.x > canvas.width) star.x = 0;
-      if (star.y < 0) star.y = canvas.height;
-      if (star.y > canvas.height) star.y = 0;
-    }
-
-    ctx.fillStyle = `rgba(140, 180, 255, ${star.alpha})`;
-    ctx.fillRect(star.x, star.y, star.size, star.size);
+    ambientParticles[i].update(canvas.width, canvas.height);
+    ambientParticles[i].draw(ctx);
   }
 
-  // 2. Draw portrait pixels if assembly has triggered
+  // 2. Draw portrait pixels if assembly has triggered (portrait unchanged)
   if (startParticleAssembly) {
     for (let i = 0; i < particles.length; i++) {
       particles[i].update();
