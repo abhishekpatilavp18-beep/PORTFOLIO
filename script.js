@@ -1735,6 +1735,7 @@ function initBooksShowcase() {
 
   function shiftCarousel(dir) {
     if (carouselBusy || state.mode !== 'hero' || N <= VISIBLE) return;
+    if (window.SoundFX) SoundFX.book.slide();
     carouselBusy = true;
     const outgoing = currentWindow;
     carouselStart = (((carouselStart + dir) % N) + N) % N;
@@ -1836,6 +1837,7 @@ function initBooksShowcase() {
 
   function open(book) {
     if (state.mode !== 'hero' || !book) return;
+    if (window.SoundFX) SoundFX.book.open();
     state.mode = 'opening';
     state.selected = book;
     if (openSlip) openSlip.classList.remove('is-visible');
@@ -1865,6 +1867,7 @@ function initBooksShowcase() {
 
   function close() {
     if (state.mode !== 'detail') return;
+    if (window.SoundFX) SoundFX.book.close();
     state.mode = 'closing';
     root.classList.remove('detail-open');
     orbit.drag = false;
