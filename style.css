@@ -404,6 +404,20 @@ body.intro-finished {
   pointer-events: auto;
 }
 
+/* Scroll Progress Bar at Bottom of Fixed Navbar */
+.scroll-progress-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.85), 0 0 24px rgba(129, 140, 248, 0.5);
+  z-index: 101;
+  pointer-events: none;
+  transition: width 0.08s ease-out;
+}
+
 .hero-role-wrapper {
   display: flex;
   align-items: baseline;
@@ -1962,6 +1976,186 @@ body.intro-finished {
     flex-direction: column-reverse;
     align-items: flex-start;
     gap: 16px;
+  }
+}
+
+/* =========================================
+   MILLION DOLLAR SCROLL REVEAL SYSTEM
+   Cinematic, 120fps GPU accelerated reveals
+   ========================================= */
+
+/* Base hidden state for any element observed for scroll entrance */
+[data-reveal] {
+  opacity: 0;
+  transition-property: opacity, transform, filter;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity, filter;
+}
+
+/* 1. Category / Eyebrow Badges */
+[data-reveal="badge"] {
+  transform: translateY(22px) scale(0.92);
+  filter: blur(6px);
+  transition-duration: 0.75s;
+}
+
+[data-reveal="badge"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* 2. Bold Section Headings */
+[data-reveal="title"] {
+  transform: translateY(46px);
+  filter: blur(12px);
+  transition-duration: 0.95s;
+  transition-delay: 0.08s;
+  position: relative;
+}
+
+[data-reveal="title"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Metallic Light Shimmer across title upon reveal */
+[data-reveal="title"].is-revealed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%);
+  background-size: 200% 100%;
+  pointer-events: none;
+  animation: titleShimmer 1.4s ease 0.4s forwards;
+  opacity: 0;
+}
+
+@keyframes titleShimmer {
+  0% { background-position: 200% 0; opacity: 0; }
+  30% { opacity: 1; }
+  100% { background-position: -200% 0; opacity: 0; }
+}
+
+/* 3. Subtitles & Supporting Text */
+[data-reveal="subtitle"] {
+  transform: translateY(28px);
+  filter: blur(8px);
+  transition-duration: 0.85s;
+  transition-delay: 0.16s;
+}
+
+[data-reveal="subtitle"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 4. Luxury Card Surfaces (About Bio Card, Social Flip Container) */
+[data-reveal="card"] {
+  transform: translateY(55px) scale(0.96);
+  filter: blur(10px);
+  transition-duration: 1.05s;
+  transition-delay: 0.12s;
+  position: relative;
+}
+
+[data-reveal="card"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* Bio Card Luminous Sheen sweep on reveal */
+.bio-card.is-revealed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.85), transparent);
+  animation: bioCardSheen 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  pointer-events: none;
+}
+
+@keyframes bioCardSheen {
+  0% { left: -100%; opacity: 0; }
+  50% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+/* 5. 3D Stages (3D Books Showcase, Breakout Game Panel) */
+[data-reveal="stage"] {
+  transform: translateY(65px) scale(0.95);
+  filter: blur(12px);
+  transition-duration: 1.15s;
+  transition-delay: 0.18s;
+}
+
+[data-reveal="stage"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* 6. Social Flip Button: Staggered 3D Cascading Flip Entrance on Scroll */
+.social-flip-wrapper:not(.is-revealed) .social-flip-node {
+  opacity: 0;
+  transform: perspective(600px) rotateY(-80deg) scale(0.7);
+}
+
+.social-flip-wrapper.is-revealed .social-flip-node {
+  opacity: 1;
+  transform: perspective(600px) rotateY(0deg) scale(1);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.social-flip-wrapper.is-revealed .social-flip-node[data-index="0"] { transition-delay: 0.10s; }
+.social-flip-wrapper.is-revealed .social-flip-node[data-index="1"] { transition-delay: 0.18s; }
+.social-flip-wrapper.is-revealed .social-flip-node[data-index="2"] { transition-delay: 0.26s; }
+.social-flip-wrapper.is-revealed .social-flip-node[data-index="3"] { transition-delay: 0.34s; }
+.social-flip-wrapper.is-revealed .social-flip-node[data-index="4"] { transition-delay: 0.42s; }
+.social-flip-wrapper.is-revealed .social-flip-node[data-index="5"] { transition-delay: 0.50s; }
+.social-flip-wrapper.is-revealed .social-flip-node[data-index="6"] { transition-delay: 0.58s; }
+
+/* 7. Breakout Game Panel neon glow sweep on reveal */
+.breakout-panel.is-revealed {
+  animation: panelGlowFlash 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes panelGlowFlash {
+  0% {
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 rgba(56, 189, 248, 0);
+  }
+  40% {
+    box-shadow: 0 30px 75px rgba(0, 0, 0, 0.95), 0 0 40px rgba(56, 189, 248, 0.35);
+  }
+  100% {
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 16px rgba(56, 189, 248, 0.08);
+  }
+}
+
+/* Performance cleanup after transition finishes */
+[data-reveal].reveal-done {
+  will-change: auto;
+  filter: none !important;
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal="badge"],
+  [data-reveal="title"],
+  [data-reveal="subtitle"],
+  [data-reveal="card"],
+  [data-reveal="stage"],
+  .social-flip-wrapper:not(.is-revealed) .social-flip-node {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
   }
 }
 

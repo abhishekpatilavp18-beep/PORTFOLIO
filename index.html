@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Abhishek — Portfolio</title>
-  <link rel="stylesheet" href="style.css?v=20261017b" />
+  <link rel="stylesheet" href="style.css?v=20261017d" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
@@ -26,6 +26,7 @@
       <a href="#project" class="nav-link">PROJECT</a>
       <a href="#contact" class="nav-link">CONTACT</a>
     </nav>
+    <div class="scroll-progress-line" id="scrollProgressLine"></div>
   </header>
 
   <!-- Hero Section -->
@@ -63,13 +64,13 @@
     <div class="about-container">
       <!-- Left Column: Intro Heading -->
       <div class="about-left">
-        <span class="section-badge">ABOUT ME</span>
-        <h2 class="section-title">Intro</h2>
+        <span class="section-badge" data-reveal="badge">ABOUT ME</span>
+        <h2 class="section-title" data-reveal="title">Intro</h2>
       </div>
 
       <!-- Right Column: Bio Card -->
       <div class="about-right">
-        <div class="bio-card" id="bioCard">
+        <div class="bio-card" id="bioCard" data-reveal="card">
           <div class="bio-text" id="bioText">
             Hey, I’m a <span class="highlight">passionate Computer Science student</span> currently in my <span class="highlight">3rd semester</span>, with a strong focus on building <span class="highlight">modern, user-friendly websites and applications</span>. Alongside core academics in <span class="highlight">data structures and algorithms</span>, I spend my time turning practical ideas into <span class="highlight">real-world projects</span> and exploring <span class="highlight">full-stack web development</span>. I genuinely enjoy <span class="highlight">solving problems</span>, understanding how software works under the hood, and refining my skills through <span class="highlight">clean code and continuous learning</span>.
           </div>
@@ -270,12 +271,13 @@
   <!-- Projects Section: 3D Books Showcase (Vengeance UI Inspired) -->
   <section class="projects-section" id="project">
     <div class="projects-header">
-      <h2 class="projects-title">FEATURED PROJECTS</h2>
-      <p class="projects-subtitle">Interactive 3D publication showcase — click any book to read architecture, tech stack & launch live demo</p>
+      <span class="section-badge" data-reveal="badge">PORTFOLIO</span>
+      <h2 class="projects-title" data-reveal="title">FEATURED PROJECTS</h2>
+      <p class="projects-subtitle" data-reveal="subtitle">Interactive 3D publication showcase — click any book to read architecture, tech stack & launch live demo</p>
     </div>
 
     <!-- 3D Books Showcase Stage -->
-    <div class="books-showcase-wrapper" id="booksShowcase" tabindex="0">
+    <div class="books-showcase-wrapper" id="booksShowcase" tabindex="0" data-reveal="stage">
       <!-- Huge background watermark word -->
       <div class="book-hero-word" id="bookHeroWord">
         <span>PROJECTS</span>
@@ -367,14 +369,14 @@
 
       <!-- Foreground Content Layer -->
       <div class="contact-content-container" id="contactContent">
-        <span class="contact-badge">GET IN TOUCH</span>
-        <h2 class="contact-headline">Let's Connect</h2>
-        <p class="contact-subline">
+        <span class="contact-badge" data-reveal="badge">GET IN TOUCH</span>
+        <h2 class="contact-headline" data-reveal="title">Let's Connect</h2>
+        <p class="contact-subline" data-reveal="subtitle">
           Hover to unlock direct social channels or drop a message anytime.
         </p>
 
         <!-- Social Flip Button (Vengeance UI Port) -->
-        <div class="social-flip-wrapper">
+        <div class="social-flip-wrapper" data-reveal="card">
           <div class="social-flip-button" id="socialFlipButton">
             <!-- Animated Glowing Border Lines Track -->
             <div class="social-border-track">
@@ -483,11 +485,11 @@
   <section class="play-section" id="play">
     <div class="play-container">
       <div class="play-header">
-        <p class="play-caption">Break it if you can. It still ships.</p>
+        <p class="play-caption" data-reveal="badge">Break it if you can. It still ships.</p>
       </div>
 
       <!-- Play Panel Wrapper -->
-      <div class="breakout-panel" id="breakoutPanel" tabindex="0" role="application" aria-label="HELLO WORLD — a playable headline. Move cursor or arrow keys to control the paddle.">
+      <div class="breakout-panel" id="breakoutPanel" tabindex="0" role="application" aria-label="HELLO WORLD — a playable headline. Move cursor or arrow keys to control the paddle." data-reveal="stage">
         <canvas id="breakoutCanvas" class="breakout-canvas"></canvas>
 
         <!-- Lives Counter (Top Right) -->
@@ -525,6 +527,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=20261017b"></script>
+  <script src="script.js?v=20261017d"></script>
 </body>
 </html>

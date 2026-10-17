@@ -443,6 +443,7 @@ function initApp() {
   initWaveGridBackground();
   initSocialFlipButton();
   initBreakoutGame();
+  initScrollReveal();
 }
 
 // Update active navbar link on scroll
@@ -469,6 +470,70 @@ function initNavObserver() {
       }
     });
   }, { passive: true });
+}
+
+/* =========================================
+   MILLION DOLLAR SCROLL REVEAL ENGINE
+   High-performance IntersectionObserver with GPU acceleration,
+   scroll progress bar, and interactive scroll prompt
+   ========================================= */
+function initScrollReveal() {
+  const revealElements = document.querySelectorAll('[data-reveal]');
+  const progressLine = document.getElementById('scrollProgressLine');
+
+  // Scroll event for glowing Navbar Progress Bar
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+
+        if (progressLine && scrollHeight > 0) {
+          const pct = Math.min(100, Math.max(0, (scrollTop / scrollHeight) * 100));
+          progressLine.style.width = `${pct}%`;
+        }
+
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  if (!revealElements.length) return;
+
+  // Modern IntersectionObserver with comfortable entry margins
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -8% 0px',
+    threshold: 0.05
+  };
+
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        el.classList.add('is-revealed');
+        observer.unobserve(el);
+
+        // Clean up will-change after transition finishes
+        setTimeout(() => {
+          el.classList.add('reveal-done');
+        }, 1300);
+      }
+    });
+  }, observerOptions);
+
+  revealElements.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    // If already in visible viewport upon load/reload, reveal immediately
+    if (rect.top < window.innerHeight * 0.92 && rect.bottom > 0) {
+      el.classList.add('is-revealed');
+      setTimeout(() => el.classList.add('reveal-done'), 1300);
+    } else {
+      revealObserver.observe(el);
+    }
+  });
 }
 
 /* =========================================
