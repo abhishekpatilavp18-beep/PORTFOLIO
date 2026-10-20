@@ -14,9 +14,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Abhishek — Portfolio</title>
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20261020_v2" />
+  <link rel="icon" type="image/png" href="favicon.png?v=20261020_v2" />
+  <link rel="shortcut icon" href="favicon.ico?v=20261020_v2" />
+  <link rel="apple-touch-icon" href="favicon.png?v=20261020_v2" />
   <link rel="stylesheet" href="style.css?v=20261020_mobile" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,17 +45,20 @@
       <span></span>
       <span></span>
     </button>
-    <div class="mobile-nav-drawer" id="mobileNavDrawer">
-      <nav class="mobile-nav-links">
-        <a href="#home" class="mobile-nav-link active">HOME</a>
-        <a href="#about" class="mobile-nav-link">ABOUT</a>
-        <a href="#skills" class="mobile-nav-link">SKILLS</a>
-        <a href="#project" class="mobile-nav-link">PROJECT</a>
-        <a href="#contact" class="mobile-nav-link">CONTACT</a>
-      </nav>
-    </div>
     <div class="scroll-progress-line" id="scrollProgressLine"></div>
   </header>
+
+  <!-- Mobile Navigation Drawer outside header for true full-screen overlay -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
+    <button class="mobile-drawer-close" id="mobileDrawerClose" aria-label="Close menu" type="button">✕</button>
+    <nav class="mobile-nav-links">
+      <a href="#home" class="mobile-nav-link active">HOME</a>
+      <a href="#about" class="mobile-nav-link">ABOUT</a>
+      <a href="#skills" class="mobile-nav-link">SKILLS</a>
+      <a href="#project" class="mobile-nav-link">PROJECT</a>
+      <a href="#contact" class="mobile-nav-link">CONTACT</a>
+    </nav>
+  </div>
 
   <!-- Hero Section -->
   <main class="hero-section" id="home">

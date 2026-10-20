@@ -652,33 +652,67 @@ function initNavObserver() {
 function initMobileMenu() {
   const toggleBtn = document.getElementById('mobileMenuToggle');
   const drawer = document.getElementById('mobileNavDrawer');
+  const closeBtn = document.getElementById('mobileDrawerClose');
   const mobileLinks = document.querySelectorAll('.mobile-nav-link');
 
   if (!toggleBtn || !drawer) return;
 
   function toggleMenu(forceOpen) {
     const shouldOpen = forceOpen !== undefined ? forceOpen : !drawer.classList.contains('active');
-    drawer.classList.toggle('active', shouldOpen);
-    toggleBtn.classList.toggle('active', shouldOpen);
+    if (shouldOpen) {
+      drawer.classList.add('active');
+      toggleBtn.classList.add('active');
+      drawer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    } else {
+      drawer.classList.remove('active');
+      toggleBtn.classList.remove('active');
+      drawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
   }
 
-  toggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+  let lastTap = 0;
+  function onTogglePress(e) {
+    if (e) {
+      e.stopPropagation();
+      if (e.cancelable) e.preventDefault();
+    }
+    const now = Date.now();
+    if (now - lastTap < 280) return;
+    lastTap = now;
     toggleMenu();
-  });
+  }
+
+  // Support both tap/touchend and click for immediate mobile response
+  toggleBtn.addEventListener('touchend', onTogglePress, { passive: false });
+  toggleBtn.addEventListener('click', onTogglePress);
+
+  if (closeBtn) {
+    const onClosePress = (e) => {
+      if (e) {
+        e.stopPropagation();
+        if (e.cancelable) e.preventDefault();
+      }
+      toggleMenu(false);
+    };
+    closeBtn.addEventListener('touchend', onClosePress, { passive: false });
+    closeBtn.addEventListener('click', onClosePress);
+  }
 
   mobileLinks.forEach((link) => {
-    link.addEventListener('click', (e) => {
+    const handleLinkClick = (e) => {
       toggleMenu(false);
       const targetId = link.getAttribute('href');
       if (targetId && targetId.startsWith('#')) {
         const targetEl = document.querySelector(targetId);
         if (targetEl) {
-          e.preventDefault();
+          if (e && e.cancelable) e.preventDefault();
           targetEl.scrollIntoView({ behavior: 'smooth' });
         }
       }
-    });
+    };
+    link.addEventListener('click', handleLinkClick);
   });
 
   drawer.addEventListener('click', (e) => {
