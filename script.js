@@ -277,9 +277,12 @@ function createParticles(assembleAnimation = true) {
   const offscreen = document.createElement('canvas');
   const offCtx = offscreen.getContext('2d');
 
-  // Big size covering more space prominently
-  const targetHeight = Math.min(canvas.height * 1.16, 960);
-  const aspect = portraitImg.width / portraitImg.height;
+  // Portrait sizing: ensure face on mobile has the exact same prominent scale and crisp sharpness as desktop
+  const isMobile = window.innerWidth <= 768;
+  const aspect = (portraitImg.width && portraitImg.height) ? (portraitImg.width / portraitImg.height) : 0.45;
+  const targetHeight = isMobile
+    ? Math.max(canvas.height * 1.22, 980)
+    : Math.min(canvas.height * 1.16, 960);
   const targetWidth = targetHeight * aspect;
 
   offscreen.width = targetWidth;
@@ -290,9 +293,10 @@ function createParticles(assembleAnimation = true) {
 
   // Align exactly in the middle horizontally, with face centered vertically
   const startX = (canvas.width - targetWidth) / 2;
-  const startY = 52;
+  const startY = isMobile ? 42 : 52;
 
-  const step = 4.2;
+  // Crisp fine particles on mobile so facial features (eyes, smile, contours) are razor sharp like desktop
+  const step = isMobile ? 3.6 : 4.2;
   const pixelSize = step;
 
   let seed = 0;
@@ -468,15 +472,78 @@ function morphText(fromText, toText, duration, onComplete) {
 // 4. Dwell time so visitors can clearly read "ABHISHEK"
 // 5. "ABHISHEK" scramble-morphs into "PORTFOLIO"
 // =========================================
+let entryTimeouts = [];
+function setEntryTimeout(fn, ms) {
+  const t = setTimeout(fn, ms);
+  entryTimeouts.push(t);
+  return t;
+}
+
+function completeIntroInstantly() {
+  if (introComplete) return;
+  introComplete = true;
+
+  entryTimeouts.forEach(clearTimeout);
+  entryTimeouts = [];
+
+  document.documentElement.classList.add('intro-finished');
+  document.body.classList.add('intro-finished');
+
+  if (iLetterWrap) {
+    iLetterWrap.classList.add('fused');
+    iLetterWrap.classList.remove('dock-impact');
+  }
+  if (prefixText) prefixText.textContent = '';
+  if (suffixText) suffixText.textContent = '';
+  if (giantTitle) {
+    giantTitle.innerHTML = 'PORTFOLIO';
+  }
+  if (heroCenter) {
+    heroCenter.classList.add('in-position');
+  }
+  if (mainNavbar) {
+    mainNavbar.classList.remove('intro-hidden');
+    mainNavbar.classList.add('intro-visible');
+  }
+  if (heroFooter) {
+    heroFooter.classList.remove('intro-hidden');
+    heroFooter.classList.add('intro-visible');
+  }
+
+  startParticleAssembly = true;
+  createParticles(true);
+}
+
+// Intentional swipe or wheel scroll finishes intro so visitor is never locked
+window.addEventListener('wheel', () => {
+  if (!introComplete) completeIntroInstantly();
+}, { passive: true, once: true });
+
+let introTouchStartY = null;
+window.addEventListener('touchstart', (e) => {
+  if (e.touches && e.touches[0]) {
+    introTouchStartY = e.touches[0].clientY;
+  }
+}, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  if (!introComplete && introTouchStartY !== null && e.touches && e.touches[0]) {
+    const diff = Math.abs(e.touches[0].clientY - introTouchStartY);
+    if (diff > 50) {
+      completeIntroInstantly();
+    }
+  }
+}, { passive: true });
+
 function runEntrySequence() {
   // Step 1: The DOT (ball) falls from the top with gravity, bounces on the floor, and settles (150ms)
-  setTimeout(() => {
+  setEntryTimeout(() => {
     iDot.classList.add('drop-bounce');
     iFloorShadow.classList.add('active-shadow');
   }, 150);
 
   // Step 2: ONLY AFTER the ball has fallen and settled, the body BAR falls from the top, lands and spring-bounces (1150ms)
-  setTimeout(() => {
+  setEntryTimeout(() => {
     iBar.classList.add('drop-bounce');
     iFloorShadow.classList.remove('active-shadow');
     void iFloorShadow.offsetWidth;
@@ -484,29 +551,29 @@ function runEntrySequence() {
   }, 1150);
 
   // Step 3: Once both the ball and bar of "i" have fully landed and settled, "ABH" on the left scramble-morphs in (2200ms, duration: 850ms)
-  setTimeout(() => {
+  setEntryTimeout(() => {
     scrambleReveal(prefixText, 'ABH', 850, () => {
       // Step 4: "SHEK" on the right scramble-morphs in gracefully (duration: 900ms)
-      setTimeout(() => {
+      setEntryTimeout(() => {
         scrambleReveal(suffixText, 'SHEK', 900, () => {
           // Step 5: Both sides assembled! Fuse "i" cleanly into uppercase "I"
-          setTimeout(() => {
+          setEntryTimeout(() => {
             iLetterWrap.classList.add('dock-impact');
             iLetterWrap.classList.add('fused');
-            setTimeout(() => {
+            setEntryTimeout(() => {
               iLetterWrap.classList.remove('dock-impact');
             }, 300);
 
             // DWELL TIME: 1.8 full seconds so visitors can read "ABHISHEK" clearly!
-            setTimeout(() => {
+            setEntryTimeout(() => {
               giantTitle.innerHTML = 'ABHISHEK';
               morphText('ABHISHEK', 'PORTFOLIO', 900, () => {
                 // Step 7: "PORTFOLIO" glides smoothly down to bottom position
-                setTimeout(() => {
+                setEntryTimeout(() => {
                   heroCenter.classList.add('in-position');
 
                   // Step 8: Reveal navbar, footer, and trigger cosmic particle assembly
-                  setTimeout(() => {
+                  setEntryTimeout(() => {
                     mainNavbar.classList.remove('intro-hidden');
                     mainNavbar.classList.add('intro-visible');
 
@@ -537,6 +604,7 @@ function initApp() {
   animate();
   runEntrySequence();
   initNavObserver();
+  initMobileMenu();
   initAsciiGlitchRipple();
   initSolarSystem();
   initBooksShowcase();
@@ -550,6 +618,7 @@ function initApp() {
 function initNavObserver() {
   const sections = document.querySelectorAll('main[id], section[id]');
   const navLinks = document.querySelectorAll('.nav-link');
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
 
   window.addEventListener('scroll', () => {
     let current = '';
@@ -569,7 +638,54 @@ function initNavObserver() {
         link.classList.add('active');
       }
     });
+
+    mobileNavLinks.forEach((link) => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === `#${current}`) {
+        link.classList.add('active');
+      }
+    });
   }, { passive: true });
+}
+
+// Mobile Hamburger Navigation Drawer
+function initMobileMenu() {
+  const toggleBtn = document.getElementById('mobileMenuToggle');
+  const drawer = document.getElementById('mobileNavDrawer');
+  const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+  if (!toggleBtn || !drawer) return;
+
+  function toggleMenu(forceOpen) {
+    const shouldOpen = forceOpen !== undefined ? forceOpen : !drawer.classList.contains('active');
+    drawer.classList.toggle('active', shouldOpen);
+    toggleBtn.classList.toggle('active', shouldOpen);
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  mobileLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      toggleMenu(false);
+      const targetId = link.getAttribute('href');
+      if (targetId && targetId.startsWith('#')) {
+        const targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          e.preventDefault();
+          targetEl.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  });
+
+  drawer.addEventListener('click', (e) => {
+    if (e.target === drawer) {
+      toggleMenu(false);
+    }
+  });
 }
 
 /* =========================================
@@ -1061,6 +1177,7 @@ function initSolarSystem() {
   // Pointer drag to dynamically rotate 3D angle
   viewport.addEventListener('pointerdown', (e) => {
     if (e.target.closest('.planet-pill')) return;
+    if (e.pointerType === 'touch') return; // Allow natural finger scrolling on touch devices
     isDragging = true;
     startX = e.clientX;
     startY = e.clientY;
@@ -2995,12 +3112,27 @@ function initBreakoutGame() {
   animId = requestAnimationFrame(gameLoop);
 }
 
+let appInitialized = false;
+function safeInitApp() {
+  if (appInitialized) return;
+  appInitialized = true;
+  initApp();
+}
+
 if (portraitImg.complete && portraitImg.naturalWidth > 0) {
   imgLoaded = true;
-  initApp();
+  safeInitApp();
 } else {
   portraitImg.onload = () => {
     imgLoaded = true;
-    initApp();
+    safeInitApp();
   };
+  portraitImg.onerror = () => {
+    imgLoaded = false;
+    safeInitApp();
+  };
+  // Fallback safety: ensures portfolio always initializes within 1200ms even on slow networks
+  setTimeout(() => {
+    safeInitApp();
+  }, 1200);
 }

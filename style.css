@@ -16,24 +16,39 @@
 
 html {
   scroll-behavior: smooth;
-  overflow: hidden;
-  height: 100%;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
   width: 100%;
+  max-width: 100%;
   min-height: 100%;
   background-color: #000000;
   color: #ffffff;
   font-family: var(--font-main);
-  overflow: hidden;
+  overflow-x: hidden;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Enabled only after intro completes */
+/* On desktop, keep scroll locked until intro completes */
+@media (min-width: 769px) {
+  html:not(.intro-finished) {
+    overflow: hidden;
+    height: 100%;
+  }
+  body:not(.intro-finished) {
+    overflow: hidden;
+    height: 100%;
+  }
+}
+
+/* Enabled after intro completes */
 html.intro-finished {
   overflow-y: auto;
   height: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 body.intro-finished {
@@ -115,12 +130,22 @@ body.intro-finished {
   border-radius: 2px;
 }
 
+/* Mobile Nav Toggle & Drawer (Hidden on Desktop) */
+.mobile-menu-toggle {
+  display: none;
+}
+
+.mobile-nav-drawer {
+  display: none;
+}
+
 /* =========================================
    HERO SECTION & CANVAS
    ========================================= */
 .hero-section {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -446,7 +471,8 @@ body.intro-finished {
    ========================================= */
 .about-section {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   background-color: #000000;
   display: flex;
@@ -583,7 +609,8 @@ body.intro-finished {
    STACK DIVIDER (HASIBUL HASAN REFERENCE)
    ========================================= */
 .stack-divider {
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   background-color: #000000;
   display: flex;
   align-items: center;
@@ -615,7 +642,8 @@ body.intro-finished {
 
 .skills-section.solar-section {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   background: radial-gradient(circle at 50% 45%, rgba(14, 25, 45, 0.5) 0%, rgba(0, 0, 0, 1) 78%);
   display: flex;
@@ -674,7 +702,7 @@ body.intro-finished {
   perspective-origin: 50% 50%;
   cursor: grab;
   user-select: none;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .solar-viewport:active {
@@ -957,53 +985,288 @@ body.intro-finished {
   }
 }
 
-@media (max-width: 768px) {
-  .skills-section.solar-section {
-    height: auto;
-    min-height: 100vh;
-    padding: 85px 4vw 35px 4vw;
-  }
-  .solar-viewport {
-    min-height: 440px;
-  }
-  .solar-stage {
-    --solar-scale: 0.72;
-  }
-  .planet-pill {
-    padding: 5px 10px 5px 8px;
-    gap: 6px;
-  }
-  .planet-pill img {
-    width: 16px;
-    height: 16px;
-  }
-  .planet-pill span {
-    font-size: 0.72rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .solar-stage {
-    --solar-scale: 0.54;
-  }
-}
-
 /* =========================================
-   RESPONSIVE DESIGN (GENERAL)
+   RESPONSIVE DESIGN (TABLETS & MOBILE <= 960px)
    ========================================= */
 @media (max-width: 960px) {
   .nav-links {
     display: none;
   }
+
+  .mobile-menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    z-index: 105;
+    padding: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mobile-menu-toggle:active {
+    transform: scale(0.92);
+  }
+
+  .mobile-menu-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 2px;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  }
+
+  .mobile-menu-toggle.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .mobile-menu-toggle.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* Full Screen Blur Mobile Navigation Drawer */
+  .mobile-nav-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(4, 6, 10, 0.96);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-16px);
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mobile-nav-drawer.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+  }
+
+  .mobile-nav-link {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 5.5vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: #7b8396;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.25s ease, transform 0.25s ease;
+  }
+
+  .mobile-nav-link:hover,
+  .mobile-nav-link.active {
+    color: #38bdf8;
+    transform: scale(1.08);
+  }
+
   .about-container {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 36px;
   }
-  .hero-center.in-position {
-    top: calc(100vh - 16vh - 100px);
-  }
+
   .about-section {
-    padding: 90px 6vw;
+    padding: 80px 5vw 60px 5vw;
+    min-height: auto;
+  }
+}
+
+/* =========================================
+   MOBILE DEVICES (<= 768px)
+   ========================================= */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 16px 5vw;
+  }
+
+  .navbar .logo {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+  }
+
+  /* Hero adjustments */
+  .hero-section {
+    height: 100vh;
+    height: 100svh;
+    min-height: 560px;
+  }
+
+  .giant-portfolio-text {
+    font-size: clamp(1.75rem, 8.8vw, 2.7rem);
+    letter-spacing: -0.02em;
+    padding: 0 12px;
+  }
+
+  .hero-center.in-position {
+    top: auto;
+    bottom: 84px;
+    transform: translate(-50%, 0);
+  }
+
+  .hero-footer-bar {
+    bottom: 24px;
+    left: 5vw;
+    right: 5vw;
+    justify-content: center;
+  }
+
+  .hero-role-wrapper {
+    font-size: clamp(0.85rem, 3.5vw, 1.05rem);
+  }
+
+  /* About section */
+  .section-title {
+    font-size: clamp(2.6rem, 8.5vw, 4.2rem);
+  }
+
+  .bio-card {
+    padding: 26px 20px;
+    border-radius: 20px;
+  }
+
+  .bio-text {
+    font-size: 0.96rem;
+    line-height: 1.65;
+  }
+
+  /* Skills / Solar System */
+  .skills-section.solar-section {
+    height: auto;
+    min-height: auto;
+    padding: 70px 4vw 35px 4vw;
+    overflow: hidden;
+  }
+
+  .staggered-title {
+    font-size: clamp(1.8rem, 6.8vw, 2.9rem) !important;
+  }
+
+  .skills-subtitle {
+    font-size: 0.85rem;
+    padding: 0 8px;
+  }
+
+  .solar-viewport {
+    width: 100%;
+    max-width: 100%;
+    min-height: 480px;
+    max-height: 560px;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .solar-stage {
+    --solar-scale: 0.76;
+  }
+
+  .planet-pill {
+    padding: 5px 11px 5px 8px;
+    gap: 6px;
+  }
+
+  .planet-pill img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .planet-pill span {
+    font-size: 0.74rem;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE PHONES (<= 480px)
+   ========================================= */
+@media (max-width: 480px) {
+  .giant-portfolio-text {
+    font-size: clamp(1.7rem, 9.8vw, 2.45rem);
+  }
+
+  .hero-center.in-position {
+    bottom: 72px;
+  }
+
+  .hero-footer-bar {
+    bottom: 18px;
+  }
+
+  .section-badge {
+    font-size: 0.74rem;
+    letter-spacing: 2.5px;
+  }
+
+  .section-title {
+    font-size: clamp(2.2rem, 9vw, 3.2rem);
+  }
+
+  .bio-card {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .bio-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .solar-viewport {
+    min-height: 420px;
+    max-height: 490px;
+  }
+
+  .solar-stage {
+    --solar-scale: 0.62;
+  }
+
+  .planet-pill {
+    padding: 4px 8px;
+    gap: 5px;
+  }
+
+  .planet-pill img {
+    width: 14px;
+    height: 14px;
+  }
+
+  .planet-pill span {
+    font-size: 0.68rem;
+  }
+
+  .sun-core-circle {
+    width: 52px;
+    height: 52px;
+  }
+
+  .sun-label-text {
+    font-size: 0.62rem;
   }
 }
 
@@ -1014,7 +1277,8 @@ body.intro-finished {
 
 .projects-section {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   background: #000000;
   display: flex;
@@ -1072,7 +1336,7 @@ body.intro-finished {
   overflow: hidden;
   user-select: none;
   outline: none;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 /* Background Watermark Word */
@@ -1397,22 +1661,92 @@ body.intro-finished {
 }
 
 @media (max-width: 768px) {
+  .book-open-slip {
+    display: none !important;
+  }
   .projects-section {
-    padding: 70px 4vw 60px 4vw;
+    padding: 65px 4vw 45px 4vw;
+    min-height: auto;
+  }
+  .projects-title {
+    font-size: clamp(1.8rem, 6.5vw, 2.7rem);
+  }
+  .projects-subtitle {
+    font-size: 0.85rem;
+    padding: 0 10px;
   }
   .books-showcase-wrapper {
-    height: 640px;
+    height: 520px;
     border-radius: 20px;
   }
+  .book-hero-word {
+    font-size: clamp(2.4rem, 13vw, 4.5rem);
+    top: 14%;
+  }
+  .book-instructions {
+    font-size: 0.72rem;
+    bottom: 12px;
+    padding: 5px 12px;
+  }
+  .book-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+  .book-prev-btn { left: 8px; }
+  .book-next-btn { right: 8px; }
+
+  .book-detail-panel {
+    right: auto;
+    left: 10px;
+    right: 10px;
+    top: auto;
+    bottom: 10px;
+    width: calc(100% - 20px);
+    max-height: 82%;
+    overflow-y: auto;
+    transform: translate(0, 30px);
+    padding: 20px 16px;
+    border-radius: 16px;
+    background: rgba(8, 12, 18, 0.96);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95);
+  }
+  .books-showcase-wrapper.detail-open .book-detail-panel {
+    transform: translate(0, 0);
+  }
   .detail-project-title {
-    font-size: 1.8rem;
+    font-size: 1.45rem;
+    margin-bottom: 8px;
   }
   .detail-project-desc {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     line-height: 1.5;
+    margin-bottom: 14px;
   }
-  .book-prev-btn { left: 10px; }
-  .book-next-btn { right: 10px; }
+  .detail-tech-chips {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .tech-chip {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+  }
+  .detail-actions-row {
+    gap: 8px;
+  }
+  .btn-detail-action {
+    height: 40px;
+    padding: 0 16px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .books-showcase-wrapper {
+    height: 460px;
+  }
 }
 
 /* =========================================
@@ -1421,7 +1755,8 @@ body.intro-finished {
    ========================================= */
 .contact-section {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   background-color: #000000;
   display: flex;
@@ -1451,7 +1786,7 @@ body.intro-finished {
   width: 100%;
   height: 100%;
   display: block;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .wave-grid-vignette {
@@ -1729,14 +2064,47 @@ body.intro-finished {
 }
 
 @media (max-width: 640px) {
+  .contact-section {
+    padding: 65px 4vw 50px 4vw;
+    min-height: auto;
+  }
+  .contact-headline {
+    font-size: clamp(2rem, 7.5vw, 3rem);
+  }
+  .contact-subline {
+    font-size: 0.88rem;
+    padding: 0 10px;
+  }
   .social-flip-button {
-    gap: 6px;
-    padding: 10px 14px;
-    border-radius: 18px;
+    gap: 5px;
+    padding: 9px 12px;
+    border-radius: 16px;
   }
   .social-flip-node {
     width: 38px;
     height: 38px;
+  }
+}
+
+@media (max-width: 420px) {
+  .social-flip-button {
+    gap: 4px;
+    padding: 7px 9px;
+    border-radius: 14px;
+  }
+  .social-flip-node {
+    width: 33px;
+    height: 33px;
+  }
+  .social-front {
+    font-size: 0.92rem;
+  }
+  .social-back svg {
+    width: 15px;
+    height: 15px;
+  }
+  .social-tooltip {
+    display: none;
   }
 }
 
@@ -1746,7 +2114,8 @@ body.intro-finished {
    ========================================= */
 .play-section {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   background-color: #050505;
   color: #ffffff;
   padding: 95px 4vw 85px 4vw;
@@ -1908,7 +2277,8 @@ body.intro-finished {
    ========================================= */
 .portfolio-footer {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   background-color: #000000;
   color: #94a3b8;
   z-index: 20;
@@ -1966,16 +2336,40 @@ body.intro-finished {
 
 @media (max-width: 768px) {
   .play-section {
-    padding: 60px 4vw 50px 4vw;
+    padding: 55px 4vw 45px 4vw;
   }
   .breakout-panel {
     aspect-ratio: 4 / 3;
-    min-height: 400px;
+    min-height: 320px;
+    max-height: 420px;
+    touch-action: pan-y;
+  }
+  .breakout-panel.is-playing {
+    touch-action: none;
   }
   .footer-inner {
     flex-direction: column-reverse;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
     gap: 16px;
+  }
+  .footer-nav {
+    justify-content: center;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .breakout-panel {
+    min-height: 280px;
+    max-height: 360px;
+  }
+  .breakout-btn {
+    padding: 7px 18px;
+    font-size: 0.72rem;
+  }
+  .footer-copyright {
+    font-size: 0.72rem;
   }
 }
 
