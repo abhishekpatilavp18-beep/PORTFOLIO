@@ -539,6 +539,65 @@
     </div>
   </section>
 
+  <!-- Grand Finale & Engineering Manifesto Section (Inspired by Vectr) -->
+  <section class="grand-finale-section" id="manifesto" aria-label="Abhi Finale & Engineering Manifesto">
+    <div class="finale-ambient-glow" aria-hidden="true"></div>
+
+    <div class="finale-container">
+      <!-- Side-by-Side: Manifesto Quote (Left) & L Character (Right) -->
+      <div class="finale-hero-row">
+        <div class="finale-quote-col">
+          <!-- Vengeance UI FlipFadeText Component for Manifesto Quote -->
+          <div class="flip-fade-quote-container" id="flipFadeQuoteContainer" data-reveal="stage">
+            <h2 class="flip-fade-word" id="flipFadeQuoteWord" aria-label="LESS TALK. MORE CODE. GET SHIT DONE.">
+              <!-- Animated letters dynamically mounted by FlipFadeText -->
+            </h2>
+          </div>
+
+          <!-- Original 3-line quote kept commented for instant rollback if preferred:
+          <h2 class="finale-quote-title">
+            <span class="finale-quote-line" data-reveal="quote-line" style="--line-delay: 0.12s;">LESS TALK.</span>
+            <span class="finale-quote-line" data-reveal="quote-line" style="--line-delay: 0.38s;"><span class="quote-gradient-text">MORE CODE.</span></span>
+            <span class="finale-quote-line" data-reveal="quote-line" style="--line-delay: 0.64s;">GET SHIT DONE.</span>
+          </h2>
+          -->
+
+          <div class="finale-cta-wrapper" data-reveal="quote-cta" style="--line-delay: 0.4s;">
+            <a href="mailto:abhishekpatilavp18@gmail.com" class="finale-primary-cta">
+              <span>LET'S BUILD SOMETHING ICONIC</span>
+              <span class="cta-arrow-bubble" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div class="finale-character-col" data-reveal="quote-char" style="--line-delay: 0.36s;">
+          <div class="character-backdrop-glow" aria-hidden="true"></div>
+          <img 
+            src="assets/l_character.png" 
+            alt="L Lawliet — Focus & Intellect" 
+            class="finale-character-img" 
+            loading="lazy" 
+            draggable="false"
+          />
+        </div>
+      </div>
+
+      <!-- Monumental Giant Edge-to-Edge ABH!$# Typography -->
+      <div class="finale-giant-brand-stage" aria-label="ABH!$#" data-reveal="giant-brand">
+        <div class="finale-giant-brand-text">
+          <span style="--char-index: 0;">A</span>
+          <span style="--char-index: 1;">B</span>
+          <span style="--char-index: 2;">H</span>
+          <span style="--char-index: 3;">!</span>
+          <span style="--char-index: 4;">$</span>
+          <span style="--char-index: 5;">#</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Clean Developer Footer (Matching Reference) -->
   <footer class="portfolio-footer">
     <div class="footer-container">
@@ -558,7 +617,16 @@
     </div>
   </footer>
 
+  <!-- Custom Desktop Ball Cursor & Footprints System -->
+  <div class="cursor-footprints-container" id="cursorFootprints" aria-hidden="true"></div>
+  <div class="custom-ball-cursor" id="customBallCursor" aria-hidden="true">
+    <div class="custom-ball" id="customBall">
+      <div class="ball-specular"></div>
+    </div>
+    <div class="custom-ball-shadow" id="customBallShadow"></div>
+  </div>
+
   <script src="sound.js"></script>
-  <script src="script.js?v=20261017g"></script>
+  <script src="script.js?v=20261021_cursor"></script>
 </body>
 </html>

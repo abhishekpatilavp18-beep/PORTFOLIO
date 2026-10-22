@@ -512,6 +512,10 @@ function completeIntroInstantly() {
 
   startParticleAssembly = true;
   createParticles(true);
+
+  if (window.activateBallCursorNow) {
+    window.activateBallCursorNow();
+  }
 }
 
 // Intentional swipe or wheel scroll finishes intro so visitor is never locked
@@ -535,11 +539,26 @@ window.addEventListener('touchmove', (e) => {
   }
 }, { passive: true });
 
+let iDotScreenPos = null;
+function recordIDotPos() {
+  const dot = document.getElementById('iDot');
+  if (dot) {
+    const rect = dot.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      iDotScreenPos = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
+    }
+  }
+}
+
 function runEntrySequence() {
   // Step 1: The DOT (ball) falls from the top with gravity, bounces on the floor, and settles (150ms)
   setEntryTimeout(() => {
     iDot.classList.add('drop-bounce');
     iFloorShadow.classList.add('active-shadow');
+    setEntryTimeout(recordIDotPos, 900);
   }, 150);
 
   // Step 2: ONLY AFTER the ball has fallen and settled, the body BAR falls from the top, lands and spring-bounces (1150ms)
@@ -566,6 +585,7 @@ function runEntrySequence() {
 
             // DWELL TIME: 1.8 full seconds so visitors can read "ABHISHEK" clearly!
             setEntryTimeout(() => {
+              recordIDotPos();
               giantTitle.innerHTML = 'ABHISHEK';
               morphText('ABHISHEK', 'PORTFOLIO', 900, () => {
                 // Step 7: "PORTFOLIO" glides smoothly down to bottom position
@@ -587,6 +607,11 @@ function runEntrySequence() {
                     // Thousands of pixels rush in from outer space to assemble Abhishek's portrait!
                     startParticleAssembly = true;
                     createParticles(true);
+
+                    // Smooth cinematic transition: the letter "i" ball turns into the desktop cursor!
+                    if (window.transitionBallFromLetterI) {
+                      window.transitionBallFromLetterI();
+                    }
                   }, 500);
                 }, 200);
               });
@@ -598,11 +623,244 @@ function runEntrySequence() {
   }, 2200);
 }
 
+/* =========================================
+   CUSTOM DESKTOP BALL CURSOR & FOOTPRINTS
+   ========================================= */
+function initBallCursor() {
+  const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+  if (!isFinePointer || window.innerWidth < 768) {
+    return;
+  }
+
+  let footprintsContainer = document.getElementById('cursorFootprints');
+  if (!footprintsContainer) {
+    footprintsContainer = document.createElement('div');
+    footprintsContainer.id = 'cursorFootprints';
+    footprintsContainer.className = 'cursor-footprints-container';
+    footprintsContainer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(footprintsContainer);
+  }
+
+  let cursorContainer = document.getElementById('customBallCursor');
+  if (!cursorContainer) {
+    cursorContainer = document.createElement('div');
+    cursorContainer.id = 'customBallCursor';
+    cursorContainer.className = 'custom-ball-cursor';
+    cursorContainer.setAttribute('aria-hidden', 'true');
+    cursorContainer.innerHTML = `
+      <div class="custom-ball" id="customBall">
+        <div class="ball-specular"></div>
+      </div>
+      <div class="custom-ball-shadow" id="customBallShadow"></div>
+    `;
+    document.body.appendChild(cursorContainer);
+  }
+
+  const ballEl = document.getElementById('customBall');
+  const shadowEl = document.getElementById('customBallShadow');
+
+  // Activate custom desktop ball cursor
+  document.documentElement.classList.add('has-ball-cursor');
+  document.body.classList.add('has-ball-cursor');
+
+  let mouseX = -100;
+  let mouseY = -100;
+  let hasMoved = false;
+  let isCursorVisible = false;
+
+  // Trail state
+  let lastTrailX = null;
+  let lastTrailY = null;
+  const STEP_INTERVAL = 18; // Distance threshold in px between ball contact footsteps
+  const FOOTPRINT_LIFETIME = 1000; // Vanish after 1 second (1000ms)
+
+  // Ball's Footprint: The ball's floor shadow left behind as footsteps
+  function spawnBallFootprint(x, y, angleDeg) {
+    const fp = document.createElement('div');
+    fp.className = 'cursor-footprint ball-shadow-footprint';
+    fp.style.left = `${x}px`;
+    fp.style.top = `${y + 12}px`;
+    fp.style.setProperty('--rot', `${angleDeg}deg`);
+    fp.innerHTML = `<div class="ball-shadow-footstep"></div>`;
+    footprintsContainer.appendChild(fp);
+
+    // After 1 second, vanish and remove from DOM
+    setTimeout(() => {
+      if (fp.parentNode) {
+        fp.parentNode.removeChild(fp);
+      }
+    }, FOOTPRINT_LIFETIME);
+  }
+
+  function addTrailSegment(fromX, fromY, toX, toY) {
+    const dx = toX - fromX;
+    const dy = toY - fromY;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist < STEP_INTERVAL) return;
+
+    // Angle of motion along path
+    const angleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
+
+    const numSteps = Math.min(Math.floor(dist / STEP_INTERVAL), 8);
+    const stepDx = dx / numSteps;
+    const stepDy = dy / numSteps;
+
+    for (let i = 1; i <= numSteps; i++) {
+      const stepX = fromX + stepDx * i;
+      const stepY = fromY + stepDy * i;
+      spawnBallFootprint(stepX, stepY, angleDeg);
+    }
+
+    lastTrailX = toX;
+    lastTrailY = toY;
+  }
+
+  // 120fps requestAnimationFrame cursor tracking
+  function updateCursorPos() {
+    cursorContainer.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    requestAnimationFrame(updateCursorPos);
+  }
+  requestAnimationFrame(updateCursorPos);
+
+  // Mouse move listener
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    hasMoved = true;
+
+    if (!isCursorVisible) {
+      isCursorVisible = true;
+      cursorContainer.classList.add('is-active');
+      lastTrailX = mouseX;
+      lastTrailY = mouseY;
+    } else if (lastTrailX !== null && lastTrailY !== null) {
+      addTrailSegment(lastTrailX, lastTrailY, mouseX, mouseY);
+    }
+  }, { passive: true });
+
+  document.addEventListener('mouseleave', () => {
+    cursorContainer.classList.remove('is-active');
+    isCursorVisible = false;
+    lastTrailX = null;
+    lastTrailY = null;
+  });
+
+  document.addEventListener('mouseenter', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursorContainer.classList.add('is-active');
+    isCursorVisible = true;
+    lastTrailX = mouseX;
+    lastTrailY = mouseY;
+  });
+
+  // Hover state over clickable/interactive elements
+  const interactiveSelector = 'a, button, input, select, textarea, [role="button"], .nav-link, .skill-card, .project-book-wrapper, .social-btn, .breakout-btn, .breakout-panel';
+
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest(interactiveSelector)) {
+      cursorContainer.classList.add('is-hovering');
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest(interactiveSelector)) {
+      cursorContainer.classList.remove('is-hovering');
+    }
+  });
+
+  // Click & Bounce physics
+  function triggerBounce() {
+    if (!ballEl || !shadowEl) return;
+    ballEl.classList.remove('bouncing');
+    shadowEl.classList.remove('bouncing');
+    void ballEl.offsetWidth; // Force CSS reflow to restart animation reliably
+    ballEl.classList.add('bouncing');
+    shadowEl.classList.add('bouncing');
+
+    spawnClickRipple(mouseX, mouseY);
+  }
+
+  function spawnClickRipple(x, y) {
+    if (x < 0 || y < 0) return;
+    const ripple = document.createElement('div');
+    ripple.className = 'cursor-click-ripple';
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    document.body.appendChild(ripple);
+    setTimeout(() => {
+      if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+    }, 700);
+  }
+
+  window.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; // Left click only
+    cursorContainer.classList.add('is-pressing');
+  });
+
+  window.addEventListener('mouseup', (e) => {
+    if (e.button !== 0) return;
+    cursorContainer.classList.remove('is-pressing');
+    triggerBounce();
+  });
+
+  // Cinematic magnetic transition from letter "i"
+  window.transitionBallFromLetterI = function() {
+    if (!hasMoved) return;
+
+    let startX = window.innerWidth / 2;
+    let startY = window.innerHeight * 0.45;
+
+    if (iDotScreenPos) {
+      startX = iDotScreenPos.x;
+      startY = iDotScreenPos.y;
+    } else {
+      const hero = document.getElementById('heroCenter');
+      if (hero) {
+        const r = hero.getBoundingClientRect();
+        startX = r.left + r.width / 2;
+        startY = r.top + r.height * 0.4;
+      }
+    }
+
+    const targetX = mouseX > 0 ? mouseX : window.innerWidth / 2;
+    const targetY = mouseY > 0 ? mouseY : window.innerHeight / 2;
+
+    const flyer = document.createElement('div');
+    flyer.className = 'transient-i-ball';
+    flyer.style.left = `${startX}px`;
+    flyer.style.top = `${startY}px`;
+    document.body.appendChild(flyer);
+
+    const anim = flyer.animate([
+      { transform: 'translate(-50%, -50%) scale(1)', left: `${startX}px`, top: `${startY}px`, opacity: 1 },
+      { transform: 'translate(-50%, -50%) scale(1.2)', left: `${targetX}px`, top: `${targetY}px`, opacity: 1 }
+    ], {
+      duration: 600,
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+    });
+
+    anim.onfinish = () => {
+      flyer.remove();
+      cursorContainer.classList.add('is-active');
+      isCursorVisible = true;
+      triggerBounce();
+    };
+  };
+
+  window.activateBallCursorNow = function() {
+    cursorContainer.classList.add('is-active');
+    isCursorVisible = true;
+  };
+}
+
 // Handle both fresh load and cached load reliably
 function initApp() {
   initAmbientParticles();
   animate();
   runEntrySequence();
+  initBallCursor();
   initNavObserver();
   initMobileMenu();
   initAsciiGlitchRipple();
@@ -612,6 +870,7 @@ function initApp() {
   initSocialFlipButton();
   initBreakoutGame();
   initScrollReveal();
+  initFlipFadeQuote();
 }
 
 // Update active navbar link on scroll
@@ -769,7 +1028,7 @@ function initScrollReveal() {
         // Clean up will-change after transition finishes
         setTimeout(() => {
           el.classList.add('reveal-done');
-        }, 1300);
+        }, 2400);
       }
     });
   }, observerOptions);
@@ -779,7 +1038,7 @@ function initScrollReveal() {
     // If already in visible viewport upon load/reload, reveal immediately
     if (rect.top < window.innerHeight * 0.92 && rect.bottom > 0) {
       el.classList.add('is-revealed');
-      setTimeout(() => el.classList.add('reveal-done'), 1300);
+      setTimeout(() => el.classList.add('reveal-done'), 2400);
     } else {
       revealObserver.observe(el);
     }
@@ -3144,6 +3403,127 @@ function initBreakoutGame() {
 
   resetBoard();
   animId = requestAnimationFrame(gameLoop);
+}
+
+/* =========================================
+   VENGEANCE UI: FLIP-FADE TEXT (Vanilla JS Engine)
+   Faithful port of flip-fade-text.tsx from Vengeance UI:
+   - 3D perspective rotateX flip
+   - Per-letter staggered enter: rotateX(90deg) -> 0deg, y 20px -> 0px, blur 8px -> 0px
+   - Per-letter staggered exit: rotateX(0deg) -> -90deg, y 0px -> -20px, blur 0px -> 8px
+   - Mode "wait": exits prior word completely before entering next word
+   ========================================= */
+function initFlipFadeQuote() {
+  const container = document.getElementById('flipFadeQuoteContainer');
+  const wordEl = document.getElementById('flipFadeQuoteWord');
+  if (!container || !wordEl) return;
+
+  // Curated blue-cyan gradient hex values for "MORE CODE." letters
+  const moreCodeColors = [
+    '#38bdf8', '#42c3f9', '#4fc9fa', '#5ecffb', // M O R E
+    '#6ba6fa', '#78aefb', '#86b7fc', '#93c0fc', '#a0c9fd' // C O D E .
+  ];
+
+  const phrases = [
+    { text: "LESS TALK.", isGradient: false },
+    { text: "MORE CODE.", isGradient: true },
+    { text: "GET SHIT DONE.", isGradient: false }
+  ];
+
+  const interval = 2600;
+  const letterDuration = 0.6;
+  const staggerDelay = 0.07;
+  const exitStaggerDelay = 0.035;
+  let currentIndex = 0;
+  let timer = null;
+  let isExiting = false;
+
+  function renderPhrase(phraseObj) {
+    wordEl.innerHTML = '';
+    wordEl.className = `flip-fade-word ${phraseObj.isGradient ? 'is-gradient-phrase' : ''}`;
+
+    const words = phraseObj.text.split(' ');
+    let globalCharIndex = 0;
+    const letterSpans = [];
+
+    words.forEach((wordStr, wordIdx) => {
+      // Chunk wrapper prevents mid-word splitting
+      const chunk = document.createElement('span');
+      chunk.className = 'flip-fade-chunk';
+
+      const chars = wordStr.split('');
+      chars.forEach((char) => {
+        const letter = document.createElement('span');
+        letter.className = 'flip-fade-letter letter-initial';
+        letter.textContent = char;
+        letter.style.transitionDelay = `${globalCharIndex * staggerDelay}s`;
+
+        if (phraseObj.isGradient) {
+          const color = moreCodeColors[globalCharIndex % moreCodeColors.length];
+          letter.style.color = color;
+          letter.style.textShadow = `0 0 25px ${color}aa, 0 0 50px ${color}55`;
+        }
+
+        chunk.appendChild(letter);
+        letterSpans.push(letter);
+        globalCharIndex++;
+      });
+
+      wordEl.appendChild(chunk);
+
+      // Add space between word chunks
+      if (wordIdx < words.length - 1) {
+        const space = document.createElement('span');
+        space.className = 'flip-fade-space';
+        space.innerHTML = '&nbsp;';
+        wordEl.appendChild(space);
+      }
+    });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        letterSpans.forEach((letter) => {
+          letter.classList.remove('letter-initial');
+          letter.classList.add('letter-animate');
+        });
+      });
+    });
+  }
+
+  function cycleNext() {
+    if (isExiting) return;
+    isExiting = true;
+
+    const letters = wordEl.querySelectorAll('.flip-fade-letter');
+    letters.forEach((letter, i) => {
+      letter.style.transitionDelay = `${i * exitStaggerDelay}s`;
+      letter.classList.remove('letter-animate');
+      letter.classList.add('letter-exit');
+    });
+
+    const totalExitTime = (letterDuration * 0.67 + (letters.length * exitStaggerDelay)) * 1000 + 40;
+    setTimeout(() => {
+      currentIndex = (currentIndex + 1) % phrases.length;
+      renderPhrase(phrases[currentIndex]);
+      isExiting = false;
+    }, Math.max(380, totalExitTime));
+  }
+
+  // Initial render
+  renderPhrase(phrases[0]);
+
+  // Start interval loop
+  timer = setInterval(cycleNext, interval);
+
+  // Pause when tab is hidden to save GPU resources
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (timer) clearInterval(timer);
+    } else {
+      if (timer) clearInterval(timer);
+      timer = setInterval(cycleNext, interval);
+    }
+  });
 }
 
 let appInitialized = false;

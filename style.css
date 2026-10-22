@@ -2145,7 +2145,7 @@ body.intro-finished {
   max-width: 100%;
   background-color: #050505;
   color: #ffffff;
-  padding: 95px 4vw 85px 4vw;
+  padding: 85px 4vw 40px 4vw;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2300,6 +2300,402 @@ body.intro-finished {
 }
 
 /* =========================================
+   GRAND FINALE & ENGINEERING MANIFESTO SECTION
+   Inspired by Vectr (www.vectrfl.com)
+   ========================================= */
+.grand-finale-section {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  background-color: #000000;
+  box-sizing: border-box;
+  padding: clamp(38px, 4.2vw, 60px) 0 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  z-index: 15;
+}
+
+/* Ambient Radial Glow */
+.finale-ambient-glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90vw;
+  max-width: 1400px;
+  height: 360px;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(56, 189, 248, 0.12) 0%, rgba(37, 99, 235, 0.04) 50%, transparent 75%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.finale-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4.5vw, 64px);
+  box-sizing: border-box;
+}
+
+/* 1. Side-by-Side: Quote (Left) & L Character (Right) */
+.finale-hero-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(30px, 4vw, 70px);
+  margin-bottom: clamp(40px, 6vw, 90px);
+}
+
+.finale-quote-col {
+  flex: 1 1 58%;
+  max-width: 780px;
+}
+
+.finale-quote-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 6.2vw, 5.8rem);
+  font-weight: 900;
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  text-transform: uppercase;
+  margin: 0 0 clamp(18px, 2.2vw, 28px) 0;
+}
+
+.finale-quote-line {
+  display: block;
+  position: relative;
+  line-height: 1.05;
+  padding-bottom: 0.08em;
+}
+
+/* Vengeance UI Flip-Fade Text Component */
+.flip-fade-quote-container {
+  perspective: 1000px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: clamp(140px, 16vw, 195px);
+  margin-bottom: clamp(18px, 2.5vw, 32px);
+  box-sizing: border-box;
+}
+
+.flip-fade-word {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0;
+  row-gap: 0.12em;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5.2vw, 4.8rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: #ffffff;
+  transform-style: preserve-3d;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+}
+
+.flip-fade-chunk {
+  display: inline-flex;
+  white-space: nowrap;
+  transform-style: preserve-3d;
+}
+
+.flip-fade-letter {
+  display: inline-block;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+  transition: transform 0.6s cubic-bezier(0.2, 0.65, 0.3, 0.9),
+              opacity 0.6s cubic-bezier(0.2, 0.65, 0.3, 0.9),
+              filter 0.6s cubic-bezier(0.2, 0.65, 0.3, 0.9);
+}
+
+.flip-fade-letter.letter-initial {
+  transform: perspective(1000px) rotateX(90deg) translateY(20px);
+  opacity: 0;
+  filter: blur(8px);
+}
+
+.flip-fade-letter.letter-animate {
+  transform: perspective(1000px) rotateX(0deg) translateY(0);
+  opacity: 1;
+  filter: blur(0px);
+}
+
+.flip-fade-letter.letter-exit {
+  transform: perspective(1000px) rotateX(-90deg) translateY(-20px);
+  opacity: 0;
+  filter: blur(8px);
+  transition: transform 0.4s ease-in,
+              opacity 0.4s ease-in,
+              filter 0.4s ease-in;
+}
+
+.flip-fade-space {
+  display: inline-block;
+  width: 0.34em;
+}
+
+.is-gradient-phrase .flip-fade-letter {
+  filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.5));
+}
+
+.quote-gradient-text {
+  background: linear-gradient(135deg, #38bdf8 0%, #60a5fa 45%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 35px rgba(56, 189, 248, 0.4));
+}
+
+.finale-quote-subtitle {
+  font-family: var(--font-main);
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.6;
+  color: #94a3b8;
+  max-width: 680px;
+  margin: 0 0 clamp(28px, 3.5vw, 38px) 0;
+}
+
+.finale-cta-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.finale-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 30px;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 999px;
+  font-family: var(--font-main);
+  font-size: clamp(0.82rem, 0.95vw, 0.92rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 35px rgba(255, 255, 255, 0.35), 0 10px 25px rgba(0, 0, 0, 0.8);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, background-color 0.25s ease;
+}
+
+.finale-primary-cta:hover {
+  transform: translateY(-3px) scale(1.02);
+  background-color: #38bdf8;
+  color: #000000;
+  box-shadow: 0 0 50px rgba(56, 189, 248, 0.65), 0 15px 35px rgba(0, 0, 0, 0.9);
+}
+
+.cta-arrow-bubble {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, color 0.25s ease;
+}
+
+.finale-primary-cta:hover .cta-arrow-bubble {
+  transform: translateX(4px);
+  background: #000000;
+  color: #38bdf8;
+}
+
+.finale-response-badge {
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.02em;
+}
+
+/* Character Column: L Crouching */
+.finale-character-col {
+  flex: 1 1 42%;
+  max-width: 440px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  position: relative;
+}
+
+.character-backdrop-glow {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(220px, 22vw, 320px);
+  height: clamp(220px, 22vw, 320px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(59, 130, 246, 0.06) 50%, transparent 75%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.finale-character-img {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 25px rgba(56, 189, 248, 0.2));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+  user-select: none;
+}
+
+.finale-character-img:hover {
+  transform: translateY(-6px) scale(1.02);
+  filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 35px rgba(56, 189, 248, 0.35));
+}
+
+/* 2. Monumental Giant "ABHI" Typography (Vectr Style - Edge to Edge) */
+.finale-giant-brand-stage {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0 4px;
+  margin-bottom: -15px;
+  line-height: 0.76;
+}
+
+.finale-giant-brand-text {
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 16.5vw, 21.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.82;
+  margin: 0;
+  padding: 0 1vw;
+  user-select: none;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  box-sizing: border-box;
+  white-space: nowrap;
+  
+  /* High-end Metallic Chrome / Solid White Sheen */
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #ffffff 45%,
+    #e2e8f0 70%,
+    #64748b 95%,
+    rgba(100, 116, 139, 0.4) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.95));
+  transition: filter 0.35s ease;
+}
+
+.finale-giant-brand-text span {
+  display: inline-block;
+  line-height: inherit;
+}
+
+.finale-giant-brand-stage:hover .finale-giant-brand-text {
+  filter: drop-shadow(0 0 40px rgba(56, 189, 248, 0.35)) drop-shadow(0 20px 45px rgba(0, 0, 0, 0.95));
+}
+
+/* Responsive Breakpoints for Finale */
+@media (max-width: 900px) {
+  .finale-hero-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 36px;
+  }
+  .finale-quote-col {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+  .finale-character-col {
+    flex: 1 1 100%;
+    max-width: 290px;
+    align-self: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .grand-finale-section {
+    padding: 30px 0 0 0;
+  }
+  .flip-fade-quote-container {
+    min-height: clamp(90px, 20vw, 130px);
+    margin-bottom: 22px;
+    justify-content: flex-start;
+  }
+  .flip-fade-word {
+    font-size: clamp(2.1rem, 8vw, 3.2rem);
+    line-height: 1.08;
+  }
+  .finale-quote-title {
+    font-size: clamp(2.2rem, 8.5vw, 3.4rem);
+    line-height: 1.02;
+  }
+  .finale-quote-subtitle {
+    font-size: 0.96rem;
+  }
+  .finale-primary-cta {
+    padding: 13px 22px;
+    font-size: 0.78rem;
+    gap: 10px;
+    width: 100%;
+    max-width: 340px;
+    justify-content: center;
+  }
+  .finale-character-col {
+    max-width: 240px;
+    margin: 15px auto 10px auto;
+  }
+  .finale-character-img {
+    max-width: 220px;
+  }
+  .finale-giant-brand-stage {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    padding: 0 8px;
+    margin-bottom: -6px;
+    overflow: hidden;
+  }
+  .finale-giant-brand-text {
+    font-size: clamp(3.2rem, 17.5vw, 6.5rem);
+    letter-spacing: -0.02em;
+    padding: 0 2vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .flip-fade-quote-container {
+    min-height: clamp(80px, 22vw, 110px);
+  }
+  .flip-fade-word {
+    font-size: clamp(1.85rem, 8.8vw, 2.6rem);
+  }
+  .finale-giant-brand-text {
+    font-size: clamp(2.7rem, 17vw, 4.6rem);
+    padding: 0 1vw;
+  }
+  .finale-primary-cta {
+    font-size: 0.74rem;
+    padding: 12px 18px;
+  }
+}
+
+/* =========================================
    PORTFOLIO FOOTER (MATCHING 3RD PICTURE)
    ========================================= */
 .portfolio-footer {
@@ -2309,9 +2705,9 @@ body.intro-finished {
   background-color: #000000;
   color: #94a3b8;
   z-index: 20;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
   box-sizing: border-box;
-  padding: 30px 4vw 38px 4vw;
+  padding: 10px 4vw 36px 4vw;
 }
 
 .footer-container {
@@ -2558,6 +2954,108 @@ body.intro-finished {
   }
 }
 
+/* 8. Finale Manifesto Quote Lines: Cinematic slow-motion sequential entrance */
+[data-reveal="quote-line"] {
+  opacity: 0;
+  transform: translateY(48px);
+  filter: blur(14px);
+  transition: opacity 1.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.25s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--line-delay, 0s);
+  will-change: transform, opacity, filter;
+  position: relative;
+}
+
+[data-reveal="quote-line"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Light shimmer sweep across quote lines upon entrance */
+[data-reveal="quote-line"].is-revealed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.28) 50%, transparent 75%);
+  background-size: 200% 100%;
+  pointer-events: none;
+  animation: quoteLineShimmer 1.4s ease forwards;
+  animation-delay: calc(var(--line-delay, 0s) + 0.35s);
+  opacity: 0;
+}
+
+@keyframes quoteLineShimmer {
+  0% { background-position: 200% 0; opacity: 0; }
+  30% { opacity: 1; }
+  100% { background-position: -200% 0; opacity: 0; }
+}
+
+/* 9. Finale CTA Button Entrance */
+[data-reveal="quote-cta"] {
+  opacity: 0;
+  transform: translateY(32px);
+  filter: blur(8px);
+  transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--line-delay, 0.7s);
+  will-change: transform, opacity, filter;
+}
+
+[data-reveal="quote-cta"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 10. Finale Character Column Entrance */
+[data-reveal="quote-char"] {
+  opacity: 0;
+  transform: translateY(50px) scale(0.96);
+  filter: blur(14px);
+  transition: opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.3s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--line-delay, 0.35s);
+  will-change: transform, opacity, filter;
+}
+
+[data-reveal="quote-char"].is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* 11. Giant ABH!$# Typography Staggered Slow-Motion Entrance */
+[data-reveal="giant-brand"] {
+  opacity: 1;
+}
+
+[data-reveal="giant-brand"] .finale-giant-brand-text span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(75px) scale(0.92);
+  filter: blur(16px);
+  transition: opacity 1.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.35s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 1.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(0.12s + var(--char-index, 0) * 0.11s);
+  will-change: transform, opacity, filter;
+}
+
+[data-reveal="giant-brand"].is-revealed .finale-giant-brand-text span {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+[data-reveal="giant-brand"].reveal-done .finale-giant-brand-text span {
+  will-change: auto;
+  filter: none !important;
+}
+
 /* Performance cleanup after transition finishes */
 [data-reveal].reveal-done {
   will-change: auto;
@@ -2572,6 +3070,10 @@ body.intro-finished {
   [data-reveal="subtitle"],
   [data-reveal="card"],
   [data-reveal="stage"],
+  [data-reveal="quote-line"],
+  [data-reveal="quote-cta"],
+  [data-reveal="quote-char"],
+  [data-reveal="giant-brand"] .finale-giant-brand-text span,
   .social-flip-wrapper:not(.is-revealed) .social-flip-node {
     opacity: 1 !important;
     transform: none !important;
@@ -2579,3 +3081,260 @@ body.intro-finished {
     transition: none !important;
   }
 }
+
+/* =========================================
+   CUSTOM DESKTOP BALL CURSOR & FOOTPRINTS
+   ========================================= */
+
+/* Hide OS cursor on desktop when custom ball cursor is active */
+@media (pointer: fine) and (min-width: 768px) {
+  html.has-ball-cursor,
+  html.has-ball-cursor * {
+    cursor: none !important;
+  }
+}
+
+/* Custom Cursor Root Element */
+.custom-ball-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999999;
+  will-change: transform;
+  transform: translate3d(-100px, -100px, 0) translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.custom-ball-cursor.is-active {
+  opacity: 1;
+}
+
+/* The Glowing Ball: Matches the letter "i" falling dot */
+.custom-ball {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f5f9 30%, #cbd5e1 70%, #94a3b8 100%);
+  box-shadow:
+    0 0 25px rgba(255, 255, 255, 0.95),
+    0 0 45px rgba(59, 130, 246, 0.4),
+    0 8px 18px rgba(0, 0, 0, 0.7);
+  transform-origin: center center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+/* 3D Specular Highlight on Ball */
+.ball-specular {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 6px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  transform: rotate(-35deg);
+  filter: blur(0.3px);
+  pointer-events: none;
+}
+
+/* Floor Contact Shadow below Ball */
+.custom-ball-shadow {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.55) 0%, rgba(59, 130, 246, 0.3) 45%, rgba(0, 0, 0, 0) 75%);
+  filter: blur(2.5px);
+  opacity: 0.75;
+  pointer-events: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Interactive Hover Response: Expands and illuminates brighter */
+.custom-ball-cursor.is-hovering .custom-ball {
+  transform: scale(1.3);
+  box-shadow:
+    0 0 35px rgba(255, 255, 255, 1),
+    0 0 65px rgba(56, 189, 248, 0.7),
+    0 10px 22px rgba(0, 0, 0, 0.85);
+}
+
+.custom-ball-cursor.is-hovering .custom-ball-shadow {
+  transform: translateX(-50%) scale(1.35);
+  opacity: 0.95;
+}
+
+/* Click Squash Response (mousedown) */
+.custom-ball-cursor.is-pressing .custom-ball {
+  transform: scale(1.35, 0.65) translateY(3px);
+  transition: transform 0.08s ease;
+}
+
+.custom-ball-cursor.is-pressing .custom-ball-shadow {
+  transform: translateX(-50%) scale(1.5, 0.8);
+  opacity: 1;
+}
+
+/* Click Elastic Bounce Physics Animation */
+.custom-ball.bouncing {
+  animation: ballElasticBounce 0.62s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.custom-ball-shadow.bouncing {
+  animation: ballShadowPulse 0.62s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes ballElasticBounce {
+  0% {
+    transform: scale(1.35, 0.65) translateY(3px);
+  }
+  24% {
+    transform: scale(0.76, 1.3) translateY(-26px);
+  }
+  50% {
+    transform: scale(1.18, 0.86) translateY(2px);
+  }
+  72% {
+    transform: scale(0.92, 1.08) translateY(-9px);
+  }
+  88% {
+    transform: scale(1.04, 0.96) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+
+@keyframes ballShadowPulse {
+  0% {
+    transform: translateX(-50%) scale(1.4);
+    opacity: 1;
+  }
+  24% {
+    transform: translateX(-50%) scale(0.35);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.25);
+    opacity: 0.9;
+  }
+  72% {
+    transform: translateX(-50%) scale(0.8);
+    opacity: 0.45;
+  }
+  88% {
+    transform: translateX(-50%) scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.75;
+  }
+}
+
+/* Expanding Click Ripple */
+.cursor-click-ripple {
+  position: fixed;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999995;
+  transform: translate(-50%, -50%) scale(0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(56, 189, 248, 0.15) 50%, transparent 75%);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+  animation: clickRippleExpand 0.65s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes clickRippleExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Transient Transition Flyer from "i" to cursor */
+.transient-i-ball {
+  position: fixed;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f5f9 30%, #cbd5e1 70%, #94a3b8 100%);
+  box-shadow:
+    0 0 35px rgba(255, 255, 255, 1),
+    0 0 55px rgba(59, 130, 246, 0.5),
+    0 8px 18px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  z-index: 9999998;
+  transform: translate(-50%, -50%);
+  will-change: transform, left, top;
+}
+
+/* =========================================
+   FOOTPRINTS CONTAINER & BALL SHADOW FOOTSTEPS
+   ========================================= */
+.cursor-footprints-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999990;
+  overflow: hidden;
+}
+
+/* Ball Shadow Footstep Item */
+.cursor-footprint {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  animation: ballShadowFootstepVanish 1s cubic-bezier(0.2, 0.8, 0.35, 1) forwards;
+}
+
+/* The Ball's Floor Shadow as Footsteps (Matches .i-floor-shadow & .custom-ball-shadow) */
+.ball-shadow-footstep {
+  width: 24px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.7) 0%, rgba(59, 130, 246, 0.4) 40%, rgba(0, 0, 0, 0) 75%);
+  filter: blur(2.5px);
+  pointer-events: none;
+}
+
+/* Ball shadow footstep vanishes smoothly after 1 second */
+@keyframes ballShadowFootstepVanish {
+  0% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(1);
+  }
+  30% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(0.95);
+  }
+  65% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(0.75);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(0.35);
+    filter: blur(4px);
+  }
+}
+
+
