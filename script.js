@@ -861,6 +861,8 @@ function initApp() {
   animate();
   runEntrySequence();
   initBallCursor();
+  initHeroFadeOnScroll();
+  initContactScrollCurve();
   initNavObserver();
   initMobileMenu();
   initAsciiGlitchRipple();
@@ -871,6 +873,87 @@ function initApp() {
   initBreakoutGame();
   initScrollReveal();
   initFlipFadeQuote();
+}
+
+// Fade away the home/hero page smoothly on scroll
+function initHeroFadeOnScroll() {
+  const hero = document.getElementById('home');
+  if (!hero) return;
+
+  let ticking = false;
+
+  function updateHeroFade() {
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    const fadeDistance = window.innerHeight * 0.7;
+    const progress = Math.min(1, Math.max(0, scrollY / fadeDistance));
+    const opacity = 1 - progress;
+
+    hero.style.opacity = opacity.toFixed(3);
+    hero.style.pointerEvents = opacity <= 0.02 ? 'none' : 'auto';
+
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeroFade);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  updateHeroFade();
+}
+
+// Curved arc transition for contact section (dramatic half-circle curve flattening automatically on scroll)
+function initContactScrollCurve() {
+  const contact = document.getElementById('contact');
+  const waveWrapper = document.getElementById('waveGridWrapper');
+  if (!contact || !waveWrapper) return;
+
+  let ticking = false;
+
+  function setCurve(val) {
+    const formatted = val > 0.5 ? `50% ${val.toFixed(1)}px` : '0px';
+    waveWrapper.style.borderTopLeftRadius = formatted;
+    waveWrapper.style.borderTopRightRadius = formatted;
+    contact.style.borderTopLeftRadius = formatted;
+    contact.style.borderTopRightRadius = formatted;
+  }
+
+  function updateCurve() {
+    const rect = contact.getBoundingClientRect();
+    const windowH = window.innerHeight;
+
+    // Dramatic deep half-circle arc (approx 280-320px on desktop)
+    const maxCurve = Math.min(320, Math.max(140, windowH * 0.40));
+
+    if (rect.top >= windowH * 0.95) {
+      // Below or just entering viewport: full dramatic half-circle dome
+      setCurve(maxCurve);
+    } else if (rect.top <= windowH * 0.06) {
+      // Fully scrolled into view: automatically flat in correct shape
+      setCurve(0);
+    } else {
+      // Fluid scroll transition: smoothly flattens as it arrives into place
+      const startPoint = windowH * 0.95;
+      const endPoint = windowH * 0.06;
+      const progress = Math.max(0, Math.min(1, (rect.top - endPoint) / (startPoint - endPoint)));
+      const curve = Math.pow(progress, 1.25) * maxCurve;
+      setCurve(curve);
+    }
+
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateCurve);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', updateCurve);
+  updateCurve();
 }
 
 // Update active navbar link on scroll
